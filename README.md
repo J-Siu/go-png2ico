@@ -50,7 +50,7 @@ Debug: export _DEBUG=true
 
 ### Repository
 
-- [id3go](https://github.com/J-Siu/go-png2ico)
+- [go-png2ico](https://github.com/J-Siu/go-png2ico)
 
 ### Contributors
 
