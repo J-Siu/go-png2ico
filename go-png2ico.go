@@ -234,6 +234,8 @@ func usage() {
 }
 
 func main() {
+	var e error
+
 	//Debug
 	if os.Getenv("_DEBUG") == "true" {
 		helper.Debug = true
@@ -247,11 +249,10 @@ func main() {
 		usage()
 		os.Exit(0)
 	case 1:
-		log("Input/Output file missing.")
-		os.Exit(1)
+		e = errors.New("Input/Output file missing")
 	}
+	errCheck(e)
 
-	var e error
 	fileout := args[argc-1]
 
 	// Make sure destination file is not PNG
