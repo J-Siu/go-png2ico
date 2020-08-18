@@ -62,7 +62,6 @@ func (png *PNG) Open(file string) error {
 	var e error
 	var fh *os.File
 	var n int
-	var n64 int64
 
 	fh, e = os.Open(file)
 	if e != nil {
@@ -89,11 +88,6 @@ func (png *PNG) Open(file string) error {
 		return e
 	}
 	log("PNG:Open:Header:", hex.EncodeToString(header), "(", n, ")")
-	n64, e = png.fh.Seek(0, 0)
-	if e != nil {
-		return e
-	}
-	log("PNG:Open:FH reset:", n64)
 
 	// 8byte header[0:8] - magic number
 	magic := []byte{0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}
@@ -151,16 +145,21 @@ func (png *PNG) Open(file string) error {
 
 // Read : read PNG file
 func (png *PNG) Read() *[]byte {
-	log("PNG:READ:", png.file)
+	log("PNG:Read:", png.file)
 
 	var e error
 	var n int
+	var n64 int64
+
+	n64, e = png.fh.Seek(0, 0)
+	errCheck(e)
+	log("PNG:Read:FH reset:", n64)
 
 	b := make([]byte, png.size)
 	n, e = png.fh.Read(b)
 	errCheck(e)
 
-	log("PNG:READ:byte", n)
+	log("PNG:Read:byte", n)
 
 	return &b
 }
@@ -253,12 +252,12 @@ func main() {
 	}
 
 	var e error
-
 	fileout := args[argc-1]
+
 	// Make sure destination file is not PNG
 	png := new(PNG)
 	if png.Open(fileout) == nil || png.isPNG {
-		e = errors.New(png.file + " is a PNG file.")
+		e = errors.New("Output file (" + png.file + ") is a PNG file.")
 	} else {
 		e = nil
 	}
@@ -268,15 +267,15 @@ func main() {
 	pngs := []*PNG{}
 	pngc := argc - 1
 	var pngTotalSize uint32 = 0
-	LenICONDIR := 6
-	LenICONDIRENTRY := 16
-	LenAllICONDIRENTRY := LenICONDIRENTRY * pngc
+	var LenICONDIR uint32 = 6
+	var LenICONDIRENTRY uint32 = 16
+	var LenAllICONDIRENTRY uint32 = LenICONDIRENTRY * uint32(pngc)
 	for i := 0; i < pngc; i++ {
 		png := new(PNG)
 		e = png.Open(args[i])
 		errCheck(e)
 		// offset = len(ICONDIR) + len(all ICONDIRENTRY) + len(all PNG before current one)
-		png.offset = uint32(LenICONDIR) + uint32(LenAllICONDIRENTRY) + pngTotalSize
+		png.offset = LenICONDIR + LenAllICONDIRENTRY + pngTotalSize
 		pngs = append(pngs, png)
 		pngTotalSize += png.size
 	}
