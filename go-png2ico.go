@@ -92,7 +92,7 @@ func (png *PNG) Open(file string) error {
 	// 8byte header[0:8] - magic number
 	magic := []byte{0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}
 	if bytes.Equal(magic[:], header[:8]) {
-		log("Found PNG magic")
+		log("PNG:Open: Found PNG magic")
 	} else {
 		return errors.New("Not PNG")
 	}
@@ -101,7 +101,7 @@ func (png *PNG) Open(file string) error {
 
 	// 4byte header[12:16] - chunk type IHDR
 	if bytes.Equal([]byte("IHDR"), header[12:16]) {
-		log("Found IHDR chunk")
+		log("PNG:Open: Found IHDR chunk")
 	} else {
 		return errors.New("PNG no IHDR chunk")
 	}
@@ -111,12 +111,13 @@ func (png *PNG) Open(file string) error {
 
 	// 4byte header[16:20] - width
 	width := binary.BigEndian.Uint32(header[16:20])
+	log("PNG:Open:width:", width)
 
 	// 4byte header[20:24] - height
 	height := binary.BigEndian.Uint32(header[20:24])
+	log("PNG:Open:height:", height)
 
 	if width <= 256 && height <= 256 {
-		log("PNG:Open:", width, "x", height)
 		// ICO format use 0 for 256px
 		if width == 256 {
 			width = 0
@@ -132,14 +133,14 @@ func (png *PNG) Open(file string) error {
 
 	// 1byte header[25] - color depth
 	png.depth = uint16(uint8(header[24]))
-	log("PNG:Open:Bit/pixel:", png.depth)
+	log("PNG:Open:depth:", png.depth)
 
 	stat, _ := os.Stat(file)
 	png.size = uint32(stat.Size())
-	log("PNG:Open:Size:", png.size)
+	log("PNG:Open:size:", png.size)
 
 	// Pass all check, create PNG struct
-	log("PNG:Open:PNG:", *png)
+	log("PNG:Open:png:", *png)
 
 	return nil
 }
@@ -154,7 +155,7 @@ func (png *PNG) Read() error {
 
 	n64, e = png.fh.Seek(0, 0)
 	errCheck(e)
-	log("PNG:Read:fh.Seek:", n64)
+	log("PNG:Read:Seek:", n64)
 
 	png.buf = make([]byte, png.size)
 	n, e = png.fh.Read(png.buf)
@@ -166,7 +167,7 @@ func (png *PNG) Read() error {
 // Open : open ICO filehandle
 func (ico *ICO) Open(file string) error {
 	var e error
-	log("ICO:Open:" + file)
+	log("ICO:Open:", file)
 	ico.fh, e = os.Create(file)
 	return (e)
 }
@@ -197,7 +198,7 @@ func (ico *ICO) ICONDIR(num uint16) *[]byte {
 
 // ICONDIRENTRY - return ICONDIRENTRY byte array
 func (png *PNG) ICONDIRENTRY() *[]byte {
-	log("ICONDIRENTRY:", *png)
+	log("PNG:ICONDIRENTRY:png:", *png)
 	/*
 		16byte ICONDIRENTRY - LittleEndian
 		00:   xx    // 1byte, width
@@ -252,7 +253,7 @@ func main() {
 	if png.Open(fileout) == nil || png.isPNG {
 		errCheck(errors.New("Output file (" + png.file + ") is a PNG file."))
 	} else {
-		log(png.file + " not PNG")
+		log("main:", png.file, "not PNG")
 	}
 
 	// Get and calculate all PNGs info
