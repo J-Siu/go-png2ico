@@ -4,6 +4,7 @@
 
 - [What It Does](#what-it-does)
 - [What It Does Not](#what-it-does-not)
+- [Install](#install)
 - [Usage](#usage)
 - [Repository](#repository)
 - [Contributors](#contributors)
@@ -25,6 +26,14 @@
 - Change PNG to BMP inside ICO
 - Check file extension
 - Transform PNG
+
+### Install
+
+```sh
+go get github.com/J-Siu/go-png2ico
+cd $GOPATH/src/github.com/J-Siu/go-png2ico
+go install
+```
 
 ### Usage
 
