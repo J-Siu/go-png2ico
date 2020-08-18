@@ -60,26 +60,25 @@ func (png *PNG) Open(file string) error {
 	log("PNG:Open:", file)
 
 	var e error
-	var fh *os.File
 	var n int
 
-	fh, e = os.Open(file)
+	png.file = file
+	png.isPNG = false
+
+	png.fh, e = os.Open(file)
 	if e != nil {
 		return e
 	}
 
-	png.file = file
-	png.fh = fh
-	png.isPNG = false
-
-	/* PNG header check(25byte)
-	89 50 4e 47 0d 0a 1a 0a // 8byte - magic number
-	// IHDR chunk
-	xx xx xx xx // 4byte - chunk length
-	49 48 44 52 // 4byte - chunk type(IHDR)
-	xx xx xx xx // 4byte - width
-	xx xx xx xx // 4byte - height
-	xx          // 1byte - bit death (bit/pixel)
+	/*
+		25byte PNG header - BigEndian
+		00:	89 50 4e 47 0d 0a 1a 0a // 8byte - magic number
+		IHDR chunk
+		08:	xx xx xx xx // 4byte - chunk length
+		12:	49 48 44 52 // 4byte - chunk type(IHDR)
+		16:	xx xx xx xx // 4byte - width
+		20:	xx xx xx xx // 4byte - height
+		24:	xx          // 1byte - bit depth (bit/pixel)
 	*/
 	headerLen := 25
 	header := make([]byte, headerLen)
@@ -92,15 +91,16 @@ func (png *PNG) Open(file string) error {
 	// 8byte header[0:8] - magic number
 	magic := []byte{0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}
 	if bytes.Equal(magic[:], header[:8]) {
-		log("Found PNG magic.")
+		log("Found PNG magic")
 	} else {
 		return errors.New("Not PNG")
 	}
+
 	// 4byte header[8:12] - chunk length - skipped
+
 	// 4byte header[12:16] - chunk type IHDR
-	chunk := []byte{0x49, 0x48, 0x44, 0x52}
-	if bytes.Equal(chunk[:], header[12:16]) {
-		log("Found IHDR chunk.")
+	if bytes.Equal([]byte("IHDR"), header[12:16]) {
+		log("Found IHDR chunk")
 	} else {
 		return errors.New("PNG no IHDR chunk")
 	}
@@ -159,32 +159,32 @@ func (png *PNG) Read() *[]byte {
 	n, e = png.fh.Read(b)
 	errCheck(e)
 
-	log("PNG:Read:byte", n)
+	log("PNG:Read:byte:", n)
 
 	return &b
 }
 
 // Open : open ICO filehandle
-func (ico *ICO) Open(file string) {
+func (ico *ICO) Open(file string) error {
 	var e error
 	log("ICO:Open:" + file)
 	ico.fh, e = os.Create(file)
-	errCheck(e)
+	return (e)
 }
 
 // Write : write ICO
-func (ico *ICO) Write(b *[]byte) {
+func (ico *ICO) Write(b *[]byte) error {
 	var e error
 	var n int
 	n, e = ico.fh.Write(*b)
-	errCheck(e)
 	log("ICO:Write:byte:", n)
+	return (e)
 }
 
 // ICONDIR - return ICONDIR byte array
 func (ico *ICO) ICONDIR(num uint16) *[]byte {
 	/*
-		6byte ICONDIR structure
+		6byte ICONDIR - LittleEndian
 		00:   00 00 // 2byte, must be 0
 		02:   01 00 // 2byte, 1 for ICO
 		04:   xx xx // 2byte, img number
@@ -200,7 +200,7 @@ func (ico *ICO) ICONDIR(num uint16) *[]byte {
 func (png *PNG) ICONDIRENTRY() *[]byte {
 	log("ICONDIRENTRY:", *png)
 	/*
-		16byte ICONDIRENTRY structure
+		16byte ICONDIRENTRY - LittleEndian
 		00:   xx    // 1byte, width
 		01:   xx    // 1byte, height
 		02:   00    // 1byte, color palette number, 0 for PNG
@@ -230,8 +230,6 @@ func usage() {
 }
 
 func main() {
-	var e error
-
 	//Debug
 	if os.Getenv("_DEBUG") == "true" {
 		helper.Debug = true
@@ -245,20 +243,18 @@ func main() {
 		usage()
 		os.Exit(0)
 	case 1:
-		e = errors.New("Input/Output file missing")
+		errCheck(errors.New("Input/Output file missing"))
 	}
-	errCheck(e)
 
 	fileout := args[argc-1]
 
-	// Make sure destination file is not PNG
+	// Make sure destination file is *not* PNG
 	png := new(PNG)
 	if png.Open(fileout) == nil || png.isPNG {
-		e = errors.New("Output file (" + png.file + ") is a PNG file.")
+		errCheck(errors.New("Output file (" + png.file + ") is a PNG file."))
 	} else {
-		e = nil
+		log(png.file + " not PNG")
 	}
-	errCheck(e)
 
 	// Get and calculate all PNGs info
 	pngs := []*PNG{}
@@ -269,8 +265,7 @@ func main() {
 	var LenAllICONDIRENTRY uint32 = LenICONDIRENTRY * uint32(pngc)
 	for i := 0; i < pngc; i++ {
 		png := new(PNG)
-		e = png.Open(args[i])
-		errCheck(e)
+		errCheck(png.Open(args[i]))
 		// offset = len(ICONDIR) + len(all ICONDIRENTRY) + len(all PNG before current one)
 		png.offset = LenICONDIR + LenAllICONDIRENTRY + pngTotalSize
 		pngs = append(pngs, png)
@@ -279,14 +274,14 @@ func main() {
 
 	// Open ICON
 	ico := new(ICO)
-	ico.Open(fileout)
-	ico.Write(ico.ICONDIR(uint16(pngc)))
+	errCheck(ico.Open(fileout))
+	errCheck(ico.Write(ico.ICONDIR(uint16(pngc))))
 	// Write ICONDIRENTRY
 	for i := 0; i < pngc; i++ {
-		ico.Write(pngs[i].ICONDIRENTRY())
+		errCheck(ico.Write(pngs[i].ICONDIRENTRY()))
 	}
 	// Copy PNG
 	for i := 0; i < pngc; i++ {
-		ico.Write(pngs[i].Read())
+		errCheck(ico.Write(pngs[i].Read()))
 	}
 }
