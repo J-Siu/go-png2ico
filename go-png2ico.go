@@ -40,6 +40,7 @@ type PNG struct {
 	size   uint32
 	offset uint32
 	isPNG  bool
+	buf    []byte
 }
 
 func log(msg ...interface{}) {
@@ -144,7 +145,7 @@ func (png *PNG) Open(file string) error {
 }
 
 // Read : read PNG file
-func (png *PNG) Read() *[]byte {
+func (png *PNG) Read() error {
 	log("PNG:Read:", png.file)
 
 	var e error
@@ -153,15 +154,13 @@ func (png *PNG) Read() *[]byte {
 
 	n64, e = png.fh.Seek(0, 0)
 	errCheck(e)
-	log("PNG:Read:FH reset:", n64)
+	log("PNG:Read:fh.Seek:", n64)
 
-	b := make([]byte, png.size)
-	n, e = png.fh.Read(b)
-	errCheck(e)
-
+	png.buf = make([]byte, png.size)
+	n, e = png.fh.Read(png.buf)
 	log("PNG:Read:byte:", n)
 
-	return &b
+	return e
 }
 
 // Open : open ICO filehandle
@@ -282,6 +281,7 @@ func main() {
 	}
 	// Copy PNG
 	for i := 0; i < pngc; i++ {
-		errCheck(ico.Write(pngs[i].Read()))
+		errCheck(pngs[i].Read())
+		errCheck(ico.Write(&pngs[i].buf))
 	}
 }
