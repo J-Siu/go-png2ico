@@ -60,6 +60,11 @@ Debug: export _DEBUG=true
 
 - 1.0
   - Initial Commit
+- 1.0.1
+  - Fix
+    - debug log msg
+    - error check
+    - png detection
 
 ### License
 
