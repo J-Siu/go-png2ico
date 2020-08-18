@@ -184,15 +184,14 @@ func (ico *ICO) Write(b *[]byte) {
 // ICONDIR - return ICONDIR byte array
 func (ico *ICO) ICONDIR(num uint16) *[]byte {
 	/*
-	   ICONDIR structure
-	   00 00 // 2byte, must be 0
-	   01 00 // 2byte, 1 for ICO
-	   xx xx // 2byte, img number
+		6byte ICONDIR structure
+		00:   00 00 // 2byte, must be 0
+		02:   01 00 // 2byte, 1 for ICO
+		04:   xx xx // 2byte, img number
 	*/
-	b0 := []byte{0, 0, 1, 0}
-	b4 := make([]byte, 2)
-	binary.LittleEndian.PutUint16(b4, num)
-	b := append(b0, b4...)
+
+	b := []byte{0, 0, 1, 0, 0, 0}
+	binary.LittleEndian.PutUint16(b[4:6], num)
 	log("ICO:ICONDIR:", hex.EncodeToString(b))
 	return &b
 }
@@ -201,29 +200,26 @@ func (ico *ICO) ICONDIR(num uint16) *[]byte {
 func (png *PNG) ICONDIRENTRY() *[]byte {
 	log("ICONDIRENTRY:", *png)
 	/*
-	   ICONDIRENTRY structure
-	   xx    // 1byte, width
-	   xx    // 1byte, height
-	   00    // 1byte, color palette number, 0 for PNG
-	   00    // 1byte, reserved, 0
-	   00 00 // 2byte, color planes, 0 for PNG
-	   xx xx // 2byte, color depth
-	   xx xx xx xx // 4byte, image size
-	   xx xx xx xx // 4byte, image offset
+		16byte ICONDIRENTRY structure
+		00:   xx    // 1byte, width
+		01:   xx    // 1byte, height
+		02:   00    // 1byte, color palette number, 0 for PNG
+		03:   00    // 1byte, reserved, always 0
+		04:   00 00 // 2byte, color planes, 0 for PNG
+		06:   xx xx // 2byte, color depth
+		08:   xx xx xx xx // 4byte, image size
+		12:   xx xx xx xx // 4byte, image offset
 	*/
-	b0 := []byte{png.width, png.height, 0, 0, 0, 0}
-	b6 := make([]byte, 2)
-	binary.LittleEndian.PutUint16(b6, png.depth)
-	ba := make([]byte, 4)
-	binary.LittleEndian.PutUint32(ba, png.size)
-	be := make([]byte, 4)
-	binary.LittleEndian.PutUint32(be, png.offset)
-	b := append(b0, b6...)
-	c := append(b, ba...)
-	d := append(c, be...)
-	log("PNG:ICONDIRENTRY:", hex.EncodeToString(d))
 
-	return &d
+	b := make([]byte, 16)
+
+	copy(b[0:6], []byte{png.width, png.height, 0, 0, 0, 0})
+	binary.LittleEndian.PutUint16(b[6:8], png.depth)
+	binary.LittleEndian.PutUint32(b[8:12], png.size)
+	binary.LittleEndian.PutUint32(b[12:16], png.offset)
+	log("PNG:ICONDIRENTRY:", hex.EncodeToString(b))
+
+	return &b
 }
 
 func usage() {
