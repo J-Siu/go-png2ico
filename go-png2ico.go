@@ -223,10 +223,11 @@ func (png *PNG) ICONDIRENTRY() *[]byte {
 }
 
 func usage() {
-	fmt.Println("go-png2ico MIT License	Copyright (c) 2020 John Siu")
-	fmt.Println("Support: https://github.com/J-Siu/go-png2ico/issues")
-	fmt.Println("Usage: go-png2ico <PNG file> <PNG file> ... <ICO file>")
-	fmt.Println("Debug: export _DEBUG=true")
+	fmt.Println("go-png2ico version 1.0.1")
+	fmt.Println("License : MIT License Copyright (c) 2020 John Siu")
+	fmt.Println("Support : https://github.com/J-Siu/go-png2ico/issues")
+	fmt.Println("Debug   : export _DEBUG=true")
+	fmt.Println("Usage   : go-png2ico <PNG file> <PNG file> ... <ICO file>")
 }
 
 func main() {
