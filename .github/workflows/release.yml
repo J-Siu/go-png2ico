@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "*"
+  repository_dispatch:
+    types: manual
 
 jobs:
   release:
