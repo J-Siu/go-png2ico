@@ -4,7 +4,8 @@
 
 - [What It Does](#what-it-does)
 - [What It Does Not](#what-it-does-not)
-- [Install](#install)
+- [Binary](#binary)
+- [Compile](#compile)
 - [Usage](#usage)
 - [Repository](#repository)
 - [Contributors](#contributors)
