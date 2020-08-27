@@ -65,6 +65,8 @@ Debug: export _DEBUG=true
     - debug log msg
     - error check
     - png detection
+- 1.0.2
+  - Use mod
 
 ### License
 
