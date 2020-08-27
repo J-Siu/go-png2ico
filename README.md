@@ -27,7 +27,11 @@
 - Check file extension
 - Transform PNG
 
-### Install
+### Binary
+
+https://github.com/J-Siu/go-png2ico/releases
+
+### Compile
 
 ```sh
 go get github.com/J-Siu/go-png2ico
