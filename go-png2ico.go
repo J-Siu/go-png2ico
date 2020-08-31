@@ -21,7 +21,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/J-Siu/go-png2ico/helper"
+	"github.com/J-Siu/go-helper"
 )
 
 // ICO structire
@@ -43,22 +43,9 @@ type PNG struct {
 	buf    []byte
 }
 
-func log(msg ...interface{}) {
-	if helper.Debug {
-		fmt.Println("log:", msg)
-	}
-}
-
-func errCheck(e error) {
-	if e != nil {
-		fmt.Println(e)
-		os.Exit(1)
-	}
-}
-
 // Open : open PNG file
 func (png *PNG) Open(file string) error {
-	log("PNG:Open:", file)
+	helper.DebugLog("PNG:Open:", file)
 
 	var e error
 	var n int
@@ -87,12 +74,12 @@ func (png *PNG) Open(file string) error {
 	if e != nil {
 		return e
 	}
-	log("PNG:Open:Header:", hex.EncodeToString(header), "(", n, ")")
+	helper.DebugLog("PNG:Open:Header:", hex.EncodeToString(header), "(", n, ")")
 
 	// 8byte header[0:8] - magic number
 	magic := []byte{0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}
 	if bytes.Equal(magic[:], header[:8]) {
-		log("PNG:Open: Found PNG magic")
+		helper.DebugLog("PNG:Open: Found PNG magic")
 	} else {
 		return errors.New("Not PNG")
 	}
@@ -101,7 +88,7 @@ func (png *PNG) Open(file string) error {
 
 	// 4byte header[12:16] - chunk type IHDR
 	if bytes.Equal([]byte("IHDR"), header[12:16]) {
-		log("PNG:Open: Found IHDR chunk")
+		helper.DebugLog("PNG:Open: Found IHDR chunk")
 	} else {
 		return errors.New("PNG no IHDR chunk")
 	}
@@ -111,11 +98,11 @@ func (png *PNG) Open(file string) error {
 
 	// 4byte header[16:20] - width
 	width := binary.BigEndian.Uint32(header[16:20])
-	log("PNG:Open:width:", width)
+	helper.DebugLog("PNG:Open:width:", width)
 
 	// 4byte header[20:24] - height
 	height := binary.BigEndian.Uint32(header[20:24])
-	log("PNG:Open:height:", height)
+	helper.DebugLog("PNG:Open:height:", height)
 
 	if width <= 256 && height <= 256 {
 		// ICO format use 0 for 256px
@@ -133,33 +120,33 @@ func (png *PNG) Open(file string) error {
 
 	// 1byte header[25] - color depth
 	png.depth = uint16(uint8(header[24]))
-	log("PNG:Open:depth:", png.depth)
+	helper.DebugLog("PNG:Open:depth:", png.depth)
 
 	stat, _ := os.Stat(file)
 	png.size = uint32(stat.Size())
-	log("PNG:Open:size:", png.size)
+	helper.DebugLog("PNG:Open:size:", png.size)
 
 	// Pass all check, create PNG struct
-	log("PNG:Open:png:", *png)
+	helper.DebugLog("PNG:Open:png:", *png)
 
 	return nil
 }
 
 // Read : read PNG file
 func (png *PNG) Read() error {
-	log("PNG:Read:", png.file)
+	helper.DebugLog("PNG:Read:", png.file)
 
 	var e error
 	var n int
 	var n64 int64
 
 	n64, e = png.fh.Seek(0, 0)
-	errCheck(e)
-	log("PNG:Read:Seek:", n64)
+	helper.ErrCheck(e)
+	helper.DebugLog("PNG:Read:Seek:", n64)
 
 	png.buf = make([]byte, png.size)
 	n, e = png.fh.Read(png.buf)
-	log("PNG:Read:byte:", n)
+	helper.DebugLog("PNG:Read:byte:", n)
 
 	return e
 }
@@ -167,7 +154,7 @@ func (png *PNG) Read() error {
 // Open : open ICO filehandle
 func (ico *ICO) Open(file string) error {
 	var e error
-	log("ICO:Open:", file)
+	helper.DebugLog("ICO:Open:", file)
 	ico.fh, e = os.Create(file)
 	return (e)
 }
@@ -177,7 +164,7 @@ func (ico *ICO) Write(b *[]byte) error {
 	var e error
 	var n int
 	n, e = ico.fh.Write(*b)
-	log("ICO:Write:byte:", n)
+	helper.DebugLog("ICO:Write:byte:", n)
 	return (e)
 }
 
@@ -192,13 +179,13 @@ func (ico *ICO) ICONDIR(num uint16) *[]byte {
 
 	b := []byte{0, 0, 1, 0, 0, 0}
 	binary.LittleEndian.PutUint16(b[4:6], num)
-	log("ICO:ICONDIR:", hex.EncodeToString(b))
+	helper.DebugLog("ICO:ICONDIR:", hex.EncodeToString(b))
 	return &b
 }
 
 // ICONDIRENTRY - return ICONDIRENTRY byte array
 func (png *PNG) ICONDIRENTRY() *[]byte {
-	log("PNG:ICONDIRENTRY:png:", *png)
+	helper.DebugLog("PNG:ICONDIRENTRY:png:", *png)
 	/*
 		16byte ICONDIRENTRY - LittleEndian
 		00:   xx    // 1byte, width
@@ -217,7 +204,7 @@ func (png *PNG) ICONDIRENTRY() *[]byte {
 	binary.LittleEndian.PutUint16(b[6:8], png.depth)
 	binary.LittleEndian.PutUint32(b[8:12], png.size)
 	binary.LittleEndian.PutUint32(b[12:16], png.offset)
-	log("PNG:ICONDIRENTRY:", hex.EncodeToString(b))
+	helper.DebugLog("PNG:ICONDIRENTRY:", hex.EncodeToString(b))
 
 	return &b
 }
@@ -232,9 +219,7 @@ func usage() {
 
 func main() {
 	//Debug
-	if os.Getenv("_DEBUG") == "true" {
-		helper.Debug = true
-	}
+	helper.DebugEnv()
 
 	// ARGs
 	args := os.Args[1:]
@@ -244,7 +229,7 @@ func main() {
 		usage()
 		os.Exit(0)
 	case 1:
-		errCheck(errors.New("Input/Output file missing"))
+		helper.ErrCheck(errors.New("Input/Output file missing"))
 	}
 
 	fileout := args[argc-1]
@@ -252,9 +237,9 @@ func main() {
 	// Make sure destination file is *not* PNG
 	png := new(PNG)
 	if png.Open(fileout) == nil || png.isPNG {
-		errCheck(errors.New("Output file (" + png.file + ") is a PNG file."))
+		helper.ErrCheck(errors.New("Output file (" + png.file + ") is a PNG file."))
 	} else {
-		log("main:", png.file, "not PNG")
+		helper.DebugLog("main:", png.file, "not PNG")
 	}
 
 	// Get and calculate all PNGs info
@@ -266,7 +251,7 @@ func main() {
 	var LenAllICONDIRENTRY uint32 = LenICONDIRENTRY * uint32(pngc)
 	for i := 0; i < pngc; i++ {
 		png := new(PNG)
-		errCheck(png.Open(args[i]))
+		helper.ErrCheck(png.Open(args[i]))
 		// offset = len(ICONDIR) + len(all ICONDIRENTRY) + len(all PNG before current one)
 		png.offset = LenICONDIR + LenAllICONDIRENTRY + pngTotalSize
 		pngs = append(pngs, png)
@@ -275,15 +260,15 @@ func main() {
 
 	// Open ICON
 	ico := new(ICO)
-	errCheck(ico.Open(fileout))
-	errCheck(ico.Write(ico.ICONDIR(uint16(pngc))))
+	helper.ErrCheck(ico.Open(fileout))
+	helper.ErrCheck(ico.Write(ico.ICONDIR(uint16(pngc))))
 	// Write ICONDIRENTRY
 	for i := 0; i < pngc; i++ {
-		errCheck(ico.Write(pngs[i].ICONDIRENTRY()))
+		helper.ErrCheck(ico.Write(pngs[i].ICONDIRENTRY()))
 	}
 	// Copy PNG
 	for i := 0; i < pngc; i++ {
-		errCheck(pngs[i].Read())
-		errCheck(ico.Write(&pngs[i].buf))
+		helper.ErrCheck(pngs[i].Read())
+		helper.ErrCheck(ico.Write(&pngs[i].buf))
 	}
 }

@@ -72,6 +72,8 @@ Debug: export _DEBUG=true
     - png detection
 - 1.0.2
   - Use mod
+- 1.0.3
+  - Use github.com/J-Siu/go-helper
 
 ### License
 
