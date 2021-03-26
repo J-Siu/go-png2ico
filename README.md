@@ -47,7 +47,7 @@ go-png2ico
 ```
 
 ```sh
-go-png2ico MIT License  Copyright (c) 2020 John Siu
+go-png2ico MIT License Copyright (c) 2021 John Siu
 Support: https://github.com/J-Siu/go-png2ico/issues
 Usage: go-png2ico <PNG file> <PNG file> ... <ICO file>
 Debug: export _DEBUG=true
@@ -74,12 +74,14 @@ Debug: export _DEBUG=true
   - Use mod
 - 1.0.3
   - Use github.com/J-Siu/go-helper
+- 1.0.4
+  - Use Go 1.16
 
 ### License
 
 The MIT License
 
-Copyright (c) 2020 John Siu
+Copyright (c) 2021 John Siu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
