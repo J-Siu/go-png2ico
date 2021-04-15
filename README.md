@@ -4,6 +4,7 @@
 
 - [What It Does](#what-it-does)
 - [What It Does Not](#what-it-does-not)
+- [Limitation](#limitation)
 - [Binary](#binary)
 - [Compile](#compile)
 - [Usage](#usage)
@@ -27,6 +28,11 @@
 - Change PNG to BMP inside ICO
 - Check file extension
 - Transform PNG
+
+### Limitation
+
+- ICO file always created from scratch, no append nor replace within ICO file
+- PNG to ICO only, other format/conversion not supported
 
 ### Binary
 
