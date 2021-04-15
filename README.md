@@ -31,7 +31,8 @@
 
 ### Limitation
 
-- ICO file always created from scratch, no append nor replace within ICO file
+- ICO file always created from scratch
+- No append nor replace within existing ICO file
 - PNG to ICO only, other format/conversion not supported
 
 ### Binary
