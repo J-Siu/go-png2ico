@@ -3,9 +3,11 @@ name: Release
 on:
   push:
     tags:
-      - "*"
-  repository_dispatch:
-    types: manual
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   release:
@@ -13,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        go: ["1.16"]
+        go: ["1.18"]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -55,18 +57,11 @@ jobs:
           echo "::set-output name=tag_patch::${TAG_PATCH}"
           echo "::set-output name=tag_special::${TAG_SPECIAL}"
 
-      - name: Cache the build cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.vars.outputs.go_cache }}
-          key: ${{ runner.os }}-go${{ matrix.go }}-release-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go${{ matrix.go }}-release
-
       # GoReleaser will take care of publishing those artifacts into the release
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
+          distribution: goreleaser
           version: latest
           args: release --rm-dist
         env:
