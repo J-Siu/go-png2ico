@@ -5,6 +5,7 @@ Command line tool to create ICO(favicon) from PNG images.
 ### Table Of Content
 <!-- TOC -->
 
+- [Table Of Content](#table-of-content)
 - [What It Does](#what-it-does)
 - [What It Does Not](#what-it-does-not)
 - [Limitation](#limitation)
@@ -17,7 +18,7 @@ Command line tool to create ICO(favicon) from PNG images.
 - [License](#license)
 
 <!-- /TOC -->
-
+<!--more-->
 ### What It Does
 
 - Create ICO file from PNG files
