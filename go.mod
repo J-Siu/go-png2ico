@@ -1,10 +1,10 @@
 module go-png2ico
 
-go 1.18
+go 1.20
 
-require github.com/J-Siu/go-helper v1.0.0
+require github.com/J-Siu/go-helper v1.1.6
 
 require (
-	golang.org/x/crypto v0.0.0-20220507011949-2cf3adece122 // indirect
-	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
+	golang.org/x/crypto v0.7.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
 )
