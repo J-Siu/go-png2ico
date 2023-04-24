@@ -58,7 +58,7 @@ go-png2ico
 ```
 
 ```sh
-go-png2ico MIT License Copyright (c) 2021 John Siu
+go-png2ico MIT License Copyright (c) 2023 John Siu
 Support: https://github.com/J-Siu/go-png2ico/issues
 Usage: go-png2ico <PNG file> <PNG file> ... <ICO file>
 Debug: export _DEBUG=true
@@ -91,6 +91,8 @@ Debug: export _DEBUG=true
   - Fix `goreleaser`
 - v1.0.6
   - Update to Go 1.20 and dependency
+- v1.0.7
+  - Support PNG with height and width above 256
 
 ### License
 

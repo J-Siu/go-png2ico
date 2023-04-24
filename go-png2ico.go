@@ -1,7 +1,7 @@
 /*
 The MIT License
 
-Copyright (c) 2021 John Siu
+Copyright (c) 2023 John Siu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -19,7 +19,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/J-Siu/go-helper"
 )
@@ -105,16 +104,15 @@ func (png *PNG) Open(file string) error {
 	helper.DebugLog("PNG:Open:height:", height)
 
 	if width <= 256 && height <= 256 {
-		// ICO format use 0 for 256px
-		if width == 256 {
+		// ICO format use 0 for 256px or larger
+		if width >= 256 {
 			width = 0
 		}
-		if height == 256 {
+		if height >= 256 {
 			height = 0
 		}
-	} else {
-		return errors.New(png.file + "(" + strconv.FormatUint(uint64(width), 10) + "x" + strconv.FormatUint(uint64(height), 10) + "): Width and height cannot be larger than 256.")
 	}
+
 	png.width = uint8(width)
 	png.height = uint8(height)
 
@@ -210,8 +208,8 @@ func (png *PNG) ICONDIRENTRY() *[]byte {
 }
 
 func usage() {
-	fmt.Println("go-png2ico version 1.0.4")
-	fmt.Println("License : MIT License Copyright (c) 2021 John Siu")
+	fmt.Println("go-png2ico version 1.0.7")
+	fmt.Println("License : MIT License Copyright (c) 2023 John Siu")
 	fmt.Println("Support : https://github.com/J-Siu/go-png2ico/issues")
 	fmt.Println("Debug   : export _DEBUG=true")
 	fmt.Println("Usage   : go-png2ico <PNG file> <PNG file> ... <ICO file>")
