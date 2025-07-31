@@ -12,27 +12,23 @@ permissions:
 jobs:
   release:
     name: Release
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        go: ["1.18"]
-    runs-on: ${{ matrix.os }}
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Install Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go }}
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      # So GoReleaser can generate the changelog properly
-      - name: Unshallowify the repo clone
+      - name: Unshallow repo
         run: git fetch --prune --unshallow
 
-      # https://github.community/t5/GitHub-Actions/How-to-get-just-the-tag-name/m-p/32167/highlight/true#M1027
-      - name: Print Go version and environment
+      - name: Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.24.5"
+
+      - name: Go Dependency
+        run: go mod tidy
+
+      - name: Env
         id: vars
         run: |
           printf "Using go at: $(which go)\n"
@@ -41,10 +37,9 @@ jobs:
           go env
           printf "\n\nSystem environment:\n\n"
           env
-          echo "::set-output name=version_tag::${GITHUB_REF/refs\/tags\//}"
-          echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
-          echo "::set-output name=go_cache::$(go env GOCACHE)"
-
+          echo "name=version_tag::${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+          echo "name=short_sha::$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "name=go_cache::$(go env GOCACHE)" >> $GITHUB_OUTPUT
           # Parse semver
           TAG=${GITHUB_REF/refs\/tags\//}
           SEMVER_RE='[^0-9]*\([0-9]*\)[.]\([0-9]*\)[.]\([0-9]*\)\([0-9A-Za-z\.-]*\)'
@@ -52,18 +47,18 @@ jobs:
           TAG_MINOR=`echo ${TAG#v} | sed -e "s#$SEMVER_RE#\2#"`
           TAG_PATCH=`echo ${TAG#v} | sed -e "s#$SEMVER_RE#\3#"`
           TAG_SPECIAL=`echo ${TAG#v} | sed -e "s#$SEMVER_RE#\4#"`
-          echo "::set-output name=tag_major::${TAG_MAJOR}"
-          echo "::set-output name=tag_minor::${TAG_MINOR}"
-          echo "::set-output name=tag_patch::${TAG_PATCH}"
-          echo "::set-output name=tag_special::${TAG_SPECIAL}"
+          echo "name=tag_major::${TAG_MAJOR}" >> $GITHUB_OUTPUT
+          echo "name=tag_minor::${TAG_MINOR}" >> $GITHUB_OUTPUT
+          echo "name=tag_patch::${TAG_PATCH}" >> $GITHUB_OUTPUT
+          echo "name=tag_special::${TAG_SPECIAL}" >> $GITHUB_OUTPUT
 
       # GoReleaser will take care of publishing those artifacts into the release
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+      - name: GoReleaser
+        uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.vars.outputs.version_tag }}
