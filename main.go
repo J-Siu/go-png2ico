@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 package main
 
-import "github.com/J-Siu/go-png2ico/cmd"
+import "github.com/J-Siu/go-png2ico/v2/cmd"
 
 func main() {
 	cmd.Execute()

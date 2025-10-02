@@ -5,10 +5,14 @@ Command line tool to create ICO(favicon) from PNG images.
 ### Table Of Content
 <!-- TOC -->
 
-- [Table Of Content](#table-of-content)
-- [What It Does](#what-it-does)
-- [What It Does Not](#what-it-does-not)
-- [Limitation](#limitation)
+- [Module](#module)
+  - [Install](#install)
+  - [Import](#import)
+  - [ICO Usage](#ico-usage)
+- [Command Line](#command-line)
+  - [What It Does](#what-it-does)
+  - [What It Does Not](#what-it-does-not)
+  - [Limitation](#limitation)
 - [Binary](#binary)
 - [Compile](#compile)
 - [Usage](#usage)
@@ -19,7 +23,34 @@ Command line tool to create ICO(favicon) from PNG images.
 
 <!-- /TOC -->
 <!--more-->
-### What It Does
+
+### Module
+
+#### Install
+
+```sh
+go get github.com/J-Siu/go-png2ico/v2
+```
+
+#### Import
+
+```go
+import "github.com/J-Siu/go-png2ico/v2/p2i"
+```
+
+#### ICO Usage
+
+```go
+ico := new(p2i.ICO).New(icoFile)
+ico.AddPngFile(pngFile) // Can be repeated
+ico.WriteAll()
+```
+
+Full example in [root.go](/cmd/root.go)
+
+### Command Line
+
+#### What It Does
 
 - Create ICO file from PNG files
 - ICO use PNG format for storage
@@ -27,13 +58,13 @@ Command line tool to create ICO(favicon) from PNG images.
 - PNG header check for input files
 - PNG header check for output file to avoid mistake
 
-### What It Does Not
+#### What It Does Not
 
 - Change PNG to BMP inside ICO
 - Check file extension
 - Transform PNG
 
-### Limitation
+#### Limitation
 
 - ICO file always created from scratch
 - No append nor replace within existing ICO file
@@ -54,14 +85,20 @@ go install
 ### Usage
 
 ```sh
-go-png2ico
+go-png2ico -h
 ```
 
 ```sh
-go-png2ico MIT License Copyright (c) 2025 John Siu
-Support: https://github.com/J-Siu/go-png2ico/issues
-Usage: go-png2ico <PNG file> <PNG file> ... <ICO file>
-Debug: export _DEBUG=true
+Build ICO file from PNGs
+
+Usage:
+  go-png2ico <PNG file> <PNG file> ... <ICO file> [flags]
+
+Flags:
+  -d, --debug     Enable debug
+  -h, --help      help for go-png2ico
+  -v, --verbose   Verbose
+      --version   version for go-png2ico
 ```
 
 ### Repository
@@ -95,6 +132,10 @@ Debug: export _DEBUG=true
   - Support PNG with height and width above 256
 - v1.0.8
   - Fix Github workflows
+- v2.0.0
+  - expose ICO and PNG as package p2i
+  - move to go-helper/v2
+  - use cobra for cli flag
 
 ### License
 

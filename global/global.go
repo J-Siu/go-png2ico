@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 package global
 
-import "github.com/J-Siu/go-png2ico/lib"
+import "github.com/J-Siu/go-png2ico/v2/lib"
 
 var (
 	Version = "v2.0.0"

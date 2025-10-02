@@ -28,8 +28,8 @@ import (
 
 	"github.com/J-Siu/go-helper/v2/errs"
 	"github.com/J-Siu/go-helper/v2/ezlog"
-	"github.com/J-Siu/go-png2ico/global"
-	"github.com/J-Siu/go-png2ico/p2i"
+	"github.com/J-Siu/go-png2ico/v2/global"
+	"github.com/J-Siu/go-png2ico/v2/p2i"
 	"github.com/spf13/cobra"
 )
 

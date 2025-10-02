@@ -1,4 +1,4 @@
-module github.com/J-Siu/go-png2ico
+module github.com/J-Siu/go-png2ico/v2
 
 go 1.25.1
 
