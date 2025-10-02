@@ -61,7 +61,7 @@ func (t *PNG) Read(file string) *PNG {
 	return t
 }
 
-// Verify if Buf is PNG, if yes, calculate other fields
+// Verify if Buf is PNG, if yes, populate other fields
 func (t *PNG) Check() *PNG {
 	prefix := t.MyType + ".chkPNG"
 

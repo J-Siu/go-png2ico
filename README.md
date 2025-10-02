@@ -13,8 +13,8 @@ Command line tool to create ICO(favicon) from PNG images.
   - [What It Does](#what-it-does)
   - [What It Does Not](#what-it-does-not)
   - [Limitation](#limitation)
-- [Binary](#binary)
-- [Compile](#compile)
+- [Releases](#releases)
+- [Go Install](#go-install)
 - [Usage](#usage)
 - [Repository](#repository)
 - [Contributors](#contributors)
@@ -41,14 +41,23 @@ import "github.com/J-Siu/go-png2ico/v2/p2i"
 #### ICO Usage
 
 ```go
+// icoFile = ICO file to be created/overwritten
+// ICO object must be initialized with New()
 ico := new(p2i.ICO).New(icoFile)
-ico.AddPngFile(pngFile) // Can be repeated
+
+// pngFile = PNG file path
+// this steps can be repeated multiple times
+ico.AddPngFile(pngFile)
+
+// Create ICO file with all PNG loaded
 ico.WriteAll()
 ```
 
 Full example in [root.go](/cmd/root.go)
 
 ### Command Line
+
+This package comes with command line front end.
 
 #### What It Does
 
@@ -67,19 +76,18 @@ Full example in [root.go](/cmd/root.go)
 #### Limitation
 
 - ICO file always created from scratch
+- Will overwrite existing ICO file
 - No append nor replace within existing ICO file
 - PNG to ICO only, other format/conversion not supported
 
-### Binary
+### Releases
 
 https://github.com/J-Siu/go-png2ico/releases
 
-### Compile
+### Go Install
 
 ```sh
-go get github.com/J-Siu/go-png2ico
-cd $GOPATH/src/github.com/J-Siu/go-png2ico
-go install
+go install github.com/J-Siu/go-png2ico/v2
 ```
 
 ### Usage

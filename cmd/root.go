@@ -47,10 +47,9 @@ var rootCmd = &cobra.Command{
 		}
 		ezlog.Debug().N("Version").Mn(global.Version).Nn("Flag").M(&global.Flag).Out()
 
-		// --- check number for filename
+		// --- check number for filename, minimum 2
 
-		switch len(args) {
-		case 0, 1:
+		if len(args) < 2 {
 			errs.Queue("", errors.New("Input/Output file missing"))
 		}
 
@@ -64,7 +63,7 @@ var rootCmd = &cobra.Command{
 			if png.Err == nil && png.IsPNG() {
 				errs.Queue("", errors.New(png.File+": is PNG"))
 			} else {
-				// Clear the errs queue, in case icoFile does not exist yet
+				// Clear the errs queue, as the icoFile may not exist yet and generated a read error
 				errs.Clear()
 			}
 		}
@@ -96,7 +95,6 @@ var rootCmd = &cobra.Command{
 		}
 		if errs.IsEmpty() && global.Flag.Verbose {
 			ezlog.Log().N("ICO").M(icoFile).Out()
-
 		}
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
