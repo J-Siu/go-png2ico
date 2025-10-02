@@ -136,6 +136,8 @@ Flags:
   - expose ICO and PNG as package p2i
   - move to go-helper/v2
   - use cobra for cli flag
+- v2.0.1
+  - resolve conflict
 
 ### License
 

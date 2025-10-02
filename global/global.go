@@ -25,7 +25,7 @@ package global
 import "github.com/J-Siu/go-png2ico/v2/lib"
 
 var (
-	Version = "v2.0.0"
+	Version = "v2.0.1"
 
 	Flag lib.TypeFlag
 )
