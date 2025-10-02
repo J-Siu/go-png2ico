@@ -20,10 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package main
+package global
 
-import "github.com/J-Siu/go-png2ico/cmd"
+import "github.com/J-Siu/go-png2ico/lib"
 
-func main() {
-	cmd.Execute()
-}
+var (
+	Version = "v2.0.0"
+
+	Flag lib.TypeFlag
+)

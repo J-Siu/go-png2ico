@@ -15,6 +15,7 @@ package p2i
 import (
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"os"
 
 	"github.com/J-Siu/go-helper/v2/basestruct"
@@ -53,11 +54,15 @@ func (t *ICO) PngCount() uint16 {
 func (t *ICO) AddPng(png *PNG) *ICO {
 	prefix := t.MyType + ".AddPng"
 	// ezlog.Debug().N(prefix).N("png").M(png).Out()
-	if png.Err == nil && png.IsPNG() {
-		t.pngs = append(t.pngs, png)
-		t.pngCount++
+	if png.Err == nil {
+		if png.IsPNG() {
+			t.pngs = append(t.pngs, png)
+			t.pngCount++
+		} else {
+			t.Err = errors.New(png.File + " not PNG")
+		}
 	}
-	errs.Queue(prefix, png.Err)
+	errs.Queue(prefix, t.Err)
 	return t
 }
 

@@ -20,10 +20,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package main
+package lib
 
-import "github.com/J-Siu/go-png2ico/cmd"
-
-func main() {
-	cmd.Execute()
+// Holding all flags from command line
+type TypeFlag struct {
+	Debug   bool `json:"debug,omitempty"` // Enable debug output
+	Verbose bool `json:"verbose,omitempty"`
 }
