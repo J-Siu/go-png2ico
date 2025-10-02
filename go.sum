@@ -1,6 +1,6 @@
-github.com/J-Siu/go-helper v1.1.7 h1:8POi+Lqkhs90fu0yMKC2qcnWMbN/woLbJvP9NrA6YMk=
-github.com/J-Siu/go-helper v1.1.7/go.mod h1:PkBVY3EdVhAPE29H1Mx+nz1j01ymxy91VZV7VwHlsbA=
-golang.org/x/crypto v0.40.0 h1:r4x+VvoG5Fm+eJcxMaY8CQM7Lb0l1lsmjGBQ6s8BfKM=
-golang.org/x/crypto v0.40.0/go.mod h1:Qr1vMER5WyS2dfPHAlsOj01wgLbsyWtFn/aY+5+ZdxY=
-golang.org/x/sys v0.34.0 h1:H5Y5sJ2L2JRdyv7ROF1he/lPdvFsd0mJHFw2ThKHxLA=
-golang.org/x/sys v0.34.0/go.mod h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k=
+github.com/J-Siu/go-helper/v2 v2.4.1 h1:lVjXyXWRKuZnq9uhvwGm4Qd/jebQHyDsetGUaLte0/U=
+github.com/J-Siu/go-helper/v2 v2.4.1/go.mod h1:yjoN0uaZ75FX8xKGMZ2WpY+OwQ074cTdIolarsBH9co=
+github.com/charlievieth/strcase v0.0.5 h1:gV4iXVyD6eI5KdfOV+/vIVCKXZwtCWOmDMcu7Uy00Rs=
+github.com/charlievieth/strcase v0.0.5/go.mod h1:FIOYY1aDBMSIOFqmVomHBpoK+bteGlESRsgsdWjrhx8=
+golang.org/x/sys v0.36.0 h1:KVRy2GtZBrk1cBYA7MKu5bEZFxQk4NIDV6RLVcC8o0k=
+golang.org/x/sys v0.36.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=

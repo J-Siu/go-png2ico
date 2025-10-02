@@ -1,2 +1,6 @@
+.DS_Store
+build/
+dist/
 go-png2ico
+go.work*
 tmp
