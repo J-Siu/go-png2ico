@@ -3,7 +3,7 @@ module github.com/J-Siu/go-png2ico/v2
 go 1.25.1
 
 require (
-	github.com/J-Siu/go-helper/v2 v2.4.2
+	github.com/J-Siu/go-helper/v2 v2.5.2
 	github.com/spf13/cobra v1.10.1
 )
 

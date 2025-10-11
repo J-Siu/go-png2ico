@@ -34,9 +34,8 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use: "go-png2ico <PNG file> <PNG file> ... <ICO file>",
-	// Use:     "go-png2ico",
-	Version: global.Version,
+	Use:     "go-png2ico <PNG file> <PNG file> ... <ICO file>",
+	Version: p2i.Version,
 	Short:   "Build ICO file from PNGs",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// --- debug setup
@@ -45,7 +44,7 @@ var rootCmd = &cobra.Command{
 		if global.Flag.Debug {
 			ezlog.SetLogLevel(ezlog.DEBUG)
 		}
-		ezlog.Debug().N("Version").Mn(global.Version).Nn("Flag").M(&global.Flag).Out()
+		ezlog.Debug().N("Version").Mn(p2i.Version).Nn("Flag").M(&global.Flag).Out()
 
 		// --- check number for filename, minimum 2
 
@@ -90,7 +89,7 @@ var rootCmd = &cobra.Command{
 			errs.Queue("", ico.Err)
 		}
 		if errs.IsEmpty() {
-			ico.WriteAll()
+			ico.Write()
 			errs.Queue("", ico.Err)
 		}
 		if errs.IsEmpty() && global.Flag.Verbose {
@@ -98,8 +97,9 @@ var rootCmd = &cobra.Command{
 		}
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		if !errs.IsEmpty() {
+		if errs.NotEmpty() {
 			ezlog.Err().L().M(errs.Errs).Out()
+			cmd.Usage()
 		}
 	},
 }

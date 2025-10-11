@@ -28,13 +28,12 @@ import (
 type PNG struct {
 	basestruct.Base
 
-	// Offset     uint32   `json:"offset,omitempty"`
-	Buf    []byte `json:"buf,omitempty"`
-	Depth  uint16 `json:"depth,omitempty"` // bit/pixel
-	File   string `json:"file,omitempty"`  // filename
-	Height uint8  `json:"height,omitempty"`
-	Size   uint32 `json:"size,omitempty"`
-	Width  uint8  `json:"width,omitempty"`
+	Buf    []byte `json:"Buf"`
+	Depth  uint16 `json:"Depth"` // bit/pixel
+	File   string `json:"File"`  // filename
+	Width  uint8  `json:"Width"`
+	Height uint8  `json:"Height"`
+	Size   uint32 `json:"Size"`
 	isPNG  bool
 }
 
@@ -44,6 +43,7 @@ func (t *PNG) New() *PNG {
 	return t
 }
 
+// Valid after `Check`. Else will be `false`
 func (t *PNG) IsPNG() bool {
 	return t.isPNG
 }
@@ -99,16 +99,16 @@ func (t *PNG) Check() *PNG {
 }
 
 func (t *PNG) info() {
-	prefix := t.MyType + ".getInfo"
+	prefix := t.MyType + ".info"
 	if t.isPNG {
 
 		// 4byte header[16:20] - width
 		width := binary.BigEndian.Uint32(t.Buf[16:20])
-		ezlog.Debug().N(prefix).N("width").M(width).Out()
 
 		// 4byte header[20:24] - height
 		height := binary.BigEndian.Uint32(t.Buf[20:24])
-		ezlog.Debug().N(prefix).N("height").M(height).Out()
+
+		ezlog.Debug().N(prefix).N("width").M(width).N("height").M(height).Out()
 
 		if width <= 256 && height <= 256 {
 			// ICO format use 0 for 256px or larger
@@ -125,13 +125,10 @@ func (t *PNG) info() {
 
 		// 1byte header[25] - color depth
 		t.Depth = uint16(uint8(t.Buf[24]))
-		ezlog.Debug().N(prefix).N("depth").M(t.Depth).Out()
 
 		stat, _ := os.Stat(t.File)
 		t.Size = uint32(stat.Size())
-		ezlog.Debug().N(prefix).N("size").M(t.Size).Out()
 
-		// Pass all check, create PNG struct
 		ezlog.Debug().N(prefix).Nn("png").M(*t).Out()
 	}
 }

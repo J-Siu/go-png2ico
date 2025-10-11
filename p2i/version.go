@@ -20,12 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package global
+package p2i
 
-import (
-	"github.com/J-Siu/go-png2ico/v2/lib"
-)
-
-var (
-	Flag lib.TypeFlag
+const (
+	Version = "v2.0.2"
 )
