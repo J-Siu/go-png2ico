@@ -29,10 +29,10 @@ type PNG struct {
 	basestruct.Base
 
 	Buf    []byte `json:"Buf"`
-	Depth  uint16 `json:"Depth"` // bit/pixel
+	Depth  uint8  `json:"Depth"` // bit/pixel
 	File   string `json:"File"`  // filename
-	Width  uint8  `json:"Width"`
-	Height uint8  `json:"Height"`
+	Width  uint32 `json:"Width"`
+	Height uint32 `json:"Height"`
 	Size   uint32 `json:"Size"`
 	isPNG  bool
 }
@@ -103,28 +103,13 @@ func (t *PNG) info() {
 	if t.isPNG {
 
 		// 4byte header[16:20] - width
-		width := binary.BigEndian.Uint32(t.Buf[16:20])
+		t.Width = binary.BigEndian.Uint32(t.Buf[16:20])
 
 		// 4byte header[20:24] - height
-		height := binary.BigEndian.Uint32(t.Buf[20:24])
-
-		ezlog.Debug().N(prefix).N("width").M(width).N("height").M(height).Out()
-
-		if width <= 256 && height <= 256 {
-			// ICO format use 0 for 256px or larger
-			if width >= 256 {
-				width = 0
-			}
-			if height >= 256 {
-				height = 0
-			}
-		}
-
-		t.Width = uint8(width)
-		t.Height = uint8(height)
+		t.Height = binary.BigEndian.Uint32(t.Buf[20:24])
 
 		// 1byte header[25] - color depth
-		t.Depth = uint16(uint8(t.Buf[24]))
+		t.Depth = uint8(t.Buf[24])
 
 		stat, _ := os.Stat(t.File)
 		t.Size = uint32(stat.Size())

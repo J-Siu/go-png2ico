@@ -78,13 +78,13 @@ func (t *ICO) AddPngFile(file string) *ICO {
 }
 
 func (t *ICO) Write() *ICO {
-	prefix := t.MyType + ".WriteAll"
+	prefix := t.MyType + ".Write"
 	if !t.CheckErrInit(prefix) {
 		return t
 	}
 	// Write ICONDIR
 	if t.open().Err == nil {
-		t.writeByte(t.iconDir(t.pngCount))
+		t.writeByte(t.iconDir())
 	}
 	// Write all ICONDIRENTRY
 	for index := range t.pngs {
@@ -118,18 +118,18 @@ func (t *ICO) open() *ICO {
 
 // writeByte ICO
 func (t *ICO) writeByte(b *[]byte) *ICO {
-	prefix := t.MyType + ".write"
+	prefix := t.MyType + ".writeByte"
 	if !t.CheckErrInit(prefix) {
 		return t
 	}
 	var n int
 	n, t.Err = t.fileHandle.Write(*b)
-	ezlog.Debug().N(prefix).N("byte").M(n).Out()
+	ezlog.Debug().N(prefix).M(n).Out()
 	return t
 }
 
 // return iconDir byte array
-func (t *ICO) iconDir(num uint16) *[]byte {
+func (t *ICO) iconDir() *[]byte {
 	prefix := t.MyType + ".icondir"
 	/*
 		6byte ICONDIR - LittleEndian
@@ -138,7 +138,7 @@ func (t *ICO) iconDir(num uint16) *[]byte {
 		04:   xx xx // 2byte, img number
 	*/
 	b := []byte{0, 0, 1, 0, 0, 0}
-	binary.LittleEndian.PutUint16(b[4:6], num)
+	binary.LittleEndian.PutUint16(b[4:6], t.pngCount)
 	ezlog.Debug().N(prefix).M(hex.EncodeToString(b)).Out()
 	return &b
 }
@@ -146,16 +146,6 @@ func (t *ICO) iconDir(num uint16) *[]byte {
 // return iconDirEntry byte array
 func (t *ICO) iconDirEntry(pngIndex int) *[]byte {
 	prefix := t.MyType + ".iconDirEntry"
-	var (
-		b                  []byte = make([]byte, 16)
-		existingPngSize    uint32                                        // Sum of all PNGs' size before pngIndex
-		lenIconDirEntryAll uint32 = lenIconDirEntry * uint32(t.pngCount) // Always base on final number of PNGs
-		offset             uint32
-	)
-	for index := range pngIndex {
-		existingPngSize += t.pngs[index].Size
-	}
-	offset = lenIconDir + lenIconDirEntryAll + existingPngSize
 	/*
 		16byte ICONDIRENTRY - LittleEndian
 		00:   xx    // 1byte, width
@@ -167,9 +157,38 @@ func (t *ICO) iconDirEntry(pngIndex int) *[]byte {
 		08:   xx xx xx xx // 4byte, image size
 		12:   xx xx xx xx // 4byte, image offset
 	*/
+	var (
+		b                   []byte = make([]byte, 16)
+		existingPngSize     uint32                                        // Sum of all PNGs' size before pngIndex
+		lenIconDirEntryAll  uint32 = lenIconDirEntry * uint32(t.pngCount) // Always base on final number of PNGs
+		offset              uint32
+		pngHeight, pngWidth uint8
+		pngDepth            uint16
+	)
+	for index := range pngIndex {
+		existingPngSize += t.pngs[index].Size
+	}
+	offset = lenIconDir + lenIconDirEntryAll + existingPngSize
+
 	png := t.pngs[pngIndex]
-	copy(b[0:6], []byte{png.Width, png.Height, 0, 0, 0, 0})
-	binary.LittleEndian.PutUint16(b[6:8], png.Depth)
+
+	// ICO use 1byte height and 1byte width.
+	// If PNG height and width are > 255, they are set to 0.
+	if png.Height > 255 {
+		pngHeight = 0
+	} else {
+		pngHeight = uint8(png.Height)
+	}
+	if png.Width > 255 {
+		pngWidth = 0
+	} else {
+		pngWidth = uint8(png.Width)
+	}
+	// ICO use 2bytes for depth vs PNG 1byte
+	pngDepth = uint16(png.Depth)
+
+	copy(b[0:6], []byte{pngWidth, pngHeight, 0, 0, 0, 0})
+	binary.LittleEndian.PutUint16(b[6:8], pngDepth)
 	binary.LittleEndian.PutUint32(b[8:12], png.Size)
 	binary.LittleEndian.PutUint32(b[12:16], offset)
 

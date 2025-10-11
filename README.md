@@ -8,6 +8,7 @@ Command line tool to create ICO(favicon) from PNG images.
 - [Module](#module)
   - [Install](#install)
   - [Import](#import)
+  - [Struct](#struct)
   - [ICO Usage](#ico-usage)
 - [Command Line](#command-line)
   - [What It Does](#what-it-does)
@@ -36,6 +37,57 @@ go get github.com/J-Siu/go-png2ico/v2
 
 ```go
 import "github.com/J-Siu/go-png2ico/v2/p2i"
+```
+
+#### Struct
+
+ICO
+
+```go
+type ICO struct {
+  basestruct.Base
+
+  File       string   `json:"File"`
+  FileHandle *os.File `json:"FileHandle"`
+  pngCount   uint16
+  pngs       []*PNG
+}
+```
+
+```go
+func (t *ICO) New(file string) *ICO
+func (t *ICO) PngCount() uint16
+func (t *ICO) AddPng(png *PNG) *ICO
+func (t *ICO) AddPngFile(file string) *ICO
+func (t *ICO) WriteAll() *ICO
+func (t *ICO) open() *ICO
+func (t *ICO) write(b *[]byte) *ICO
+func (t *ICO) iconDir(num uint16) *[]byte
+func (t *ICO) iconDirEntry(pngIndex int) *[]byte
+```
+
+PNG
+
+```go
+type PNG struct {
+  basestruct.Base
+
+  Buf    []byte `json:"Buf"`
+  Depth  uint16 `json:"Depth"` // bit/pixel
+  File   string `json:"File"`  // filename
+  Height uint8  `json:"Height"`
+  Size   uint32 `json:"Size"`
+  Width  uint8  `json:"Width"`
+  isPNG  bool
+}
+```
+
+```go
+func (t *PNG) New() *PNG
+func (t *PNG) IsPNG() bool
+func (t *PNG) Read(file string) *PNG
+func (t *PNG) Check() *PNG
+func (t *PNG) info()
 ```
 
 #### ICO Usage
@@ -146,6 +198,10 @@ Flags:
   - use cobra for cli flag
 - v2.0.1
   - resolve conflict
+- v2.0.2
+  - `iconDirEntry` offset calculation cleanup
+  - update go-helper/v2
+  - Move ICO specific conversion from PNG to ICO. PNG struct stick to spec.
 
 ### License
 
