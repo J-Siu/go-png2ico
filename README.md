@@ -3,37 +3,84 @@
 Command line tool to create ICO(favicon) from PNG images.
 
 ### Table Of Content
-<!-- TOC -->
 
-- [Module](#module)
-  - [Install](#install)
-  - [Import](#import)
-  - [Struct](#struct)
-  - [ICO Usage](#ico-usage)
-- [Command Line](#command-line)
+- [Install](#install)
+- [Usage](#usage)
   - [What It Does](#what-it-does)
   - [What It Does Not](#what-it-does-not)
   - [Limitation](#limitation)
+- [Module](#module)
+  - [Struct](#struct)
+  - [ICO Usage](#ico-usage)
 - [Releases](#releases)
-- [Go Install](#go-install)
-- [Usage](#usage)
 - [Repository](#repository)
 - [Contributors](#contributors)
 - [Change Log](#change-log)
 - [License](#license)
 
-<!-- /TOC -->
 <!--more-->
+
+### Install
+
+Go install
+
+```sh
+go install github.com/J-Siu/go-png2ico/v2@latest
+```
+
+Download
+
+- https://github.com/J-Siu/go-png2ico/releases
+
+### Usage
+
+```sh
+go-png2ico -h
+```
+
+```sh
+Build ICO file from PNGs
+
+Usage:
+  go-png2ico <PNG file> <PNG file> ... <ICO file> [flags]
+
+Flags:
+  -d, --debug     Enable debug
+  -h, --help      help for go-png2ico
+  -v, --verbose   Verbose
+      --version   version for go-png2ico
+```
+
+#### What It Does
+
+- Create ICO file from PNG files
+- ICO use PNG format for storage
+- Minimum overhead(16byte) per PNG added
+- PNG header check for input files
+- PNG header check for output file to avoid mistake
+
+#### What It Does Not
+
+- Change PNG to BMP inside ICO
+- Check file extension
+- Transform PNG
+
+#### Limitation
+
+- ICO file always created from scratch
+- Will overwrite existing ICO file
+- Will not append nor replace within existing ICO file
+- PNG into ICO only, other format/conversion not supported
 
 ### Module
 
-#### Install
+Install
 
 ```sh
 go get github.com/J-Siu/go-png2ico/v2
 ```
 
-#### Import
+Import
 
 ```go
 import "github.com/J-Siu/go-png2ico/v2/p2i"
@@ -107,59 +154,9 @@ ico.WriteAll()
 
 Full example in [root.go](/cmd/root.go)
 
-### Command Line
-
-This package comes with command line front end.
-
-#### What It Does
-
-- Create ICO file from PNG files
-- ICO use PNG format for storage
-- Minimum overhead(16byte) per PNG added
-- PNG header check for input files
-- PNG header check for output file to avoid mistake
-
-#### What It Does Not
-
-- Change PNG to BMP inside ICO
-- Check file extension
-- Transform PNG
-
-#### Limitation
-
-- ICO file always created from scratch
-- Will overwrite existing ICO file
-- No append nor replace within existing ICO file
-- PNG to ICO only, other format/conversion not supported
-
 ### Releases
 
 https://github.com/J-Siu/go-png2ico/releases
-
-### Go Install
-
-```sh
-go install github.com/J-Siu/go-png2ico/v2
-```
-
-### Usage
-
-```sh
-go-png2ico -h
-```
-
-```sh
-Build ICO file from PNGs
-
-Usage:
-  go-png2ico <PNG file> <PNG file> ... <ICO file> [flags]
-
-Flags:
-  -d, --debug     Enable debug
-  -h, --help      help for go-png2ico
-  -v, --verbose   Verbose
-      --version   version for go-png2ico
-```
 
 ### Repository
 

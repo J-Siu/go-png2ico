@@ -56,8 +56,8 @@ var rootCmd = &cobra.Command{
 
 		var icoFile string
 		if errs.IsEmpty() {
+			// Make sure the last file in arg list is *NOT* PNG, to prevent accidental overwriting a PNG file
 			icoFile = args[len(args)-1]
-			// Make sure icoFile is *NOT* PNG
 			png := new(p2i.PNG).New().Read(icoFile)
 			if png.Err == nil && png.IsPNG() {
 				errs.Queue("", errors.New(png.File+": is PNG"))
