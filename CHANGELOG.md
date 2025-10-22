@@ -1,0 +1,31 @@
+- 1.0
+  - Initial Commit
+- 1.0.1
+  - Fix
+    - debug log msg
+    - error check
+    - png detection
+- 1.0.2
+  - Use mod
+- 1.0.3
+  - Use github.com/J-Siu/go-helper
+- 1.0.4
+  - Use Go 1.16
+- v1.0.5
+  - Fix `goreleaser`
+- v1.0.6
+  - Update to Go 1.20 and dependency
+- v1.0.7
+  - Support PNG with height and width above 256
+- v1.0.8
+  - Fix Github workflows
+- v2.0.0
+  - expose ICO and PNG as package p2i
+  - move to go-helper/v2
+  - use cobra for cli flag
+- v2.0.1
+  - resolve conflict
+- v2.0.2
+  - `iconDirEntry` offset calculation cleanup
+  - update go-helper/v2
+  - Move ICO specific conversion from PNG to ICO. PNG struct stick to spec.
