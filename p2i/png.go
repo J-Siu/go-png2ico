@@ -114,6 +114,6 @@ func (t *PNG) info() {
 		stat, _ := os.Stat(t.File)
 		t.Size = uint32(stat.Size())
 
-		ezlog.Debug().N(prefix).Nn("png").M(*t).Out()
+		ezlog.Debug().N(prefix).N("png").Lm(*t).Out()
 	}
 }

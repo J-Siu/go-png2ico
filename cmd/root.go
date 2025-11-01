@@ -44,7 +44,7 @@ var rootCmd = &cobra.Command{
 		if global.Flag.Debug {
 			ezlog.SetLogLevel(ezlog.DEBUG)
 		}
-		ezlog.Debug().N("Version").Mn(p2i.Version).Nn("Flag").M(&global.Flag).Out()
+		ezlog.Debug().N("Version").M(p2i.Version).Ln("Flag").M(&global.Flag).Out()
 
 		// --- check number for filename, minimum 2
 

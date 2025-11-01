@@ -29,3 +29,5 @@
   - `iconDirEntry` offset calculation cleanup
   - update go-helper/v2
   - Move ICO specific conversion from PNG to ICO. PNG struct stick to spec.
+- v2.0.3
+  - update go-helper/v2
