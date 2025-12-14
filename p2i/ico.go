@@ -130,7 +130,7 @@ func (t *ICO) writeByte(b *[]byte) *ICO {
 
 // return iconDir byte array
 func (t *ICO) iconDir() *[]byte {
-	prefix := t.MyType + ".icondir"
+	prefix := t.MyType + ".iconDir"
 	/*
 		6byte ICONDIR - LittleEndian
 		00:   00 00 // 2byte, must be 0
