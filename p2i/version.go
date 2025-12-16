@@ -23,5 +23,5 @@ THE SOFTWARE.
 package p2i
 
 const (
-	Version = "v2.0.3"
+	Version = "v2.0.4"
 )

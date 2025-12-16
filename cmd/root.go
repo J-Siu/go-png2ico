@@ -69,15 +69,14 @@ var rootCmd = &cobra.Command{
 
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		var icoFile string
-		if errs.IsEmpty() {
+		var (
+			ico     *p2i.ICO
 			icoFile = args[len(args)-1]
-		}
-		ico := new(p2i.ICO).New(icoFile)
+			pngNum  = len(args) - 1
+		)
 		if errs.IsEmpty() {
-			// Add PNGs into ico struct
-			pngc := len(args) - 1
-			for i := range pngc {
+			ico = new(p2i.ICO).New(icoFile)
+			for i := range pngNum {
 				if ico.Err != nil {
 					break
 				}
@@ -86,9 +85,6 @@ var rootCmd = &cobra.Command{
 					ezlog.Log().N("Add").M(args[i]).Out()
 				}
 			}
-			errs.Queue("", ico.Err)
-		}
-		if errs.IsEmpty() {
 			ico.Write()
 			errs.Queue("", ico.Err)
 		}
@@ -98,7 +94,7 @@ var rootCmd = &cobra.Command{
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if errs.NotEmpty() {
-			ezlog.Err().L().M(errs.Errs).Out()
+			ezlog.Err().L().M(errs.Errs()).Out()
 			cmd.Usage()
 		}
 	},
