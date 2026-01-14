@@ -80,18 +80,14 @@ func (t *PNG) Check() *PNG {
 
 	// CHECK 1: 8byte header[0:8] - magic number
 	magic := []byte{0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}
-	if bytes.Equal(magic[:], t.Buf[:8]) {
-		ezlog.Debug().N(prefix).M("Found PNG magic").Out()
-		t.isPNG = true
-	}
-
-	// CHECK 2: 4byte header[12:16] - chunk type IHDR
-	if t.isPNG && bytes.Equal([]byte("IHDR"), t.Buf[12:16]) {
-		ezlog.Debug().N(prefix).M("Found IHDR chunk").Out()
-		t.isPNG = true
-	}
-
+	t.isPNG = bytes.Equal(magic[:], t.Buf[:8])
 	if t.isPNG {
+		ezlog.Debug().N(prefix).M("Found PNG magic").Out()
+		// CHECK 2: 4byte header[12:16] - chunk type IHDR
+		t.isPNG = t.isPNG && bytes.Equal([]byte("IHDR"), t.Buf[12:16])
+	}
+	if t.isPNG {
+		ezlog.Debug().N(prefix).M("Found IHDR chunk").Out()
 		t.info()
 	}
 

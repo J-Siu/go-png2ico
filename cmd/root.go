@@ -51,14 +51,17 @@ var rootCmd = &cobra.Command{
 		if len(args) < 2 {
 			errs.Queue("", errors.New("Input/Output file missing"))
 		}
-
-		// --- Pre-checking
-
-		var icoFile string
-		if errs.IsEmpty() {
-			// Make sure the last file in arg list is *NOT* PNG, to prevent accidental overwriting a PNG file
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		var (
+			ico     *p2i.ICO
 			icoFile = args[len(args)-1]
-			png := new(p2i.PNG).New().Read(icoFile)
+			png     *p2i.PNG
+			pngNum  = len(args) - 1
+		)
+		if errs.IsEmpty() {
+			// check if output file is PNG
+			png = new(p2i.PNG).New().Read(icoFile)
 			if png.Err == nil && png.IsPNG() {
 				errs.Queue("", errors.New(png.File+": is PNG"))
 			} else {
@@ -66,14 +69,6 @@ var rootCmd = &cobra.Command{
 				errs.Clear()
 			}
 		}
-
-	},
-	Run: func(cmd *cobra.Command, args []string) {
-		var (
-			ico     *p2i.ICO
-			icoFile = args[len(args)-1]
-			pngNum  = len(args) - 1
-		)
 		if errs.IsEmpty() {
 			ico = new(p2i.ICO).New(icoFile)
 			for i := range pngNum {
