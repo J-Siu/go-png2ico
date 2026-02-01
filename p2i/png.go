@@ -48,31 +48,31 @@ func (t *PNG) IsPNG() bool {
 	return t.isPNG
 }
 
-// read PNG file. If no error, call Check
+// read PNG file and populate other fields
 func (t *PNG) Read(file string) *PNG {
 	prefix := t.MyType + ".Read"
 	t.File = file
 	t.Buf, t.Err = os.ReadFile(t.File)
 	ezlog.Debug().N(prefix).N("byte").M(len(t.Buf)).Out()
 	if t.Err == nil {
-		t.Check()
+		t.checkMagic().updateInfo()
 	}
 	errs.Queue(prefix, t.Err)
 	return t
 }
 
 // Verify if Buf is PNG, if yes, populate other fields
-func (t *PNG) Check() *PNG {
-	prefix := t.MyType + ".Check"
+func (t *PNG) checkMagic() *PNG {
+	prefix := t.MyType + ".checkMagic"
 
 	t.isPNG = false
 
 	/*
 		25byte PNG header - BigEndian
-		00:	89 50 4e 47 0d 0a 1a 0a // 8byte - magic number -> CHECK 1
+		00:	89 50 4e 47 0d 0a 1a 0a // 8byte - magic number <- CHECK 1
 		IHDR chunk
 		08:	xx xx xx xx // 4byte - chunk length
-		12:	49 48 44 52 // 4byte - chunk type(IHDR) -> CHECK 2
+		12:	49 48 44 52 // 4byte - chunk type(IHDR) <- CHECK 2
 		16:	xx xx xx xx // 4byte - width
 		20:	xx xx xx xx // 4byte - height
 		24:	xx          // 1byte - bit depth (bit/pixel)
@@ -86,30 +86,24 @@ func (t *PNG) Check() *PNG {
 		// CHECK 2: 4byte header[12:16] - chunk type IHDR
 		t.isPNG = t.isPNG && bytes.Equal([]byte("IHDR"), t.Buf[12:16])
 	}
-	if t.isPNG {
-		ezlog.Debug().N(prefix).M("Found IHDR chunk").Out()
-		t.info()
-	}
-
 	return t
 }
 
-func (t *PNG) info() {
-	prefix := t.MyType + ".info"
+// Only update info fields if `isPNG` == true
+func (t *PNG) updateInfo() *PNG {
+	prefix := t.MyType + ".updateInfo"
 	if t.isPNG {
-
 		// 4byte header[16:20] - width
 		t.Width = binary.BigEndian.Uint32(t.Buf[16:20])
-
 		// 4byte header[20:24] - height
 		t.Height = binary.BigEndian.Uint32(t.Buf[20:24])
-
 		// 1byte header[25] - color depth
 		t.Depth = uint8(t.Buf[24])
-
+		// file size
 		stat, _ := os.Stat(t.File)
 		t.Size = uint32(stat.Size())
 
 		ezlog.Debug().N(prefix).N("png").Lm(*t).Out()
 	}
+	return t
 }
