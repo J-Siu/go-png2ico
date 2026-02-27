@@ -53,23 +53,22 @@ Flags:
 #### What It Does
 
 - Create ICO file from PNG files
-- ICO use PNG format for storage
+- Only use PNG format in ICO
 - Minimum overhead(16byte) per PNG added
 - PNG header check for input files
-- PNG header check for output file to avoid mistake
+- PNG header check for output file to avoid overwriting a PNG file
 
 #### What It Does Not
 
-- Change PNG to BMP inside ICO
 - Check file extension
+- Convert PNG to BMP inside ICO
 - Transform PNG
 
 #### Limitation
 
-- ICO file always created from scratch
-- Will overwrite existing ICO file
-- Will not append nor replace within existing ICO file
+- ICO file always created from scratch or overwrote
 - PNG into ICO only, other format/conversion not supported
+- Will not append nor replace within existing ICO file
 
 ### Module
 
