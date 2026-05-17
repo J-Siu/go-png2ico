@@ -1,6 +1,23 @@
 .DS_Store
 build/
 dist/
-go-png2ico
 go.work*
 tmp
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+go-png2ico
