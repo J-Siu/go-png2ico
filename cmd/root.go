@@ -55,11 +55,12 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			ico     *p2i.ICO
-			icoFile = args[len(args)-1]
+			icoFile string
 			png     *p2i.PNG
 			pngNum  = len(args) - 1
 		)
 		if errs.IsEmpty() {
+			icoFile = args[len(args)-1]
 			// check if output file is PNG
 			png = new(p2i.PNG).New().Read(icoFile)
 			if png.Err == nil && png.IsPNG() {

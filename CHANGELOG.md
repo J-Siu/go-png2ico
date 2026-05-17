@@ -38,3 +38,5 @@
   - fix PNG.Check() logic
 - v2.0.6
   - update go-helper/v2
+- v2.0.7
+  - fix#8 index out of range
