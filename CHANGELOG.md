@@ -36,3 +36,5 @@
   - update root.go
 - v2.0.5
   - fix PNG.Check() logic
+- v2.0.6
+  - update go-helper/v2
