@@ -1,9 +1,13 @@
+# cspell: words GOCACHE
+
 name: Release
 
 on:
+  # Auto trigger on tag push
   push:
     tags:
       - "v*"
+  # Manual trigger
   workflow_dispatch:
 
 permissions:
