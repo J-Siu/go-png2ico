@@ -192,7 +192,7 @@ func (t *ICO) iconDirEntry(pngIndex int) *[]byte {
 	binary.LittleEndian.PutUint32(b[8:12], png.Size)
 	binary.LittleEndian.PutUint32(b[12:16], offset)
 
-	ezlog.Debug().N(prefix).N("byte").M(hex.EncodeToString(b)).N("PNG").M(png.File).Out()
+	ezlog.Debug().N(prefix).N("byte").M(hex.EncodeToString(b)).N("png.File").M(png.File).Out()
 
 	return &b
 }

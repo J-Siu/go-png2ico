@@ -55,7 +55,7 @@ func (t *PNG) Read(file string) *PNG {
 	t.Buf, t.Err = os.ReadFile(t.File)
 	ezlog.Debug().N(prefix).N("byte").M(len(t.Buf)).Out()
 	if t.Err == nil {
-		t.checkMagic().updateInfo()
+		t.checkMagic().getInfo()
 	}
 	errs.Queue(prefix, t.Err)
 	return t
@@ -90,8 +90,8 @@ func (t *PNG) checkMagic() *PNG {
 }
 
 // Only update info fields if `isPNG` == true
-func (t *PNG) updateInfo() *PNG {
-	prefix := t.MyType + ".updateInfo"
+func (t *PNG) getInfo() *PNG {
+	prefix := t.MyType + ".getInfo"
 	if t.isPNG {
 		// 4byte header[16:20] - width
 		t.Width = binary.BigEndian.Uint32(t.Buf[16:20])
@@ -103,7 +103,7 @@ func (t *PNG) updateInfo() *PNG {
 		stat, _ := os.Stat(t.File)
 		t.Size = uint32(stat.Size())
 
-		ezlog.Debug().N(prefix).N("png").Lm(*t).Out()
+		ezlog.Debug().N(prefix).N("png").Lm(t).Out()
 	}
 	return t
 }
