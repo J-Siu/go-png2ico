@@ -1,13 +1,9 @@
-# cspell: words GOCACHE
-
 name: Release
 
 on:
-  # Auto trigger on tag push
   push:
     tags:
       - "v*"
-  # Manual trigger
   workflow_dispatch:
 
 permissions:
@@ -35,34 +31,26 @@ jobs:
       - name: Env
         id: vars
         run: |
-          printf "Using go at: $(which go)\n"
-          printf "Go version: $(go version)\n"
-          printf "\n\nGo environment:\n\n"
+          echo "Using go at: $(which go)"
+          echo "Go version: $(go version)"
+          echo
+          echo "nGo environment:"
           go env
-          printf "\n\nSystem environment:\n\n"
-          env
-          echo "name=version_tag::${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
-          echo "name=short_sha::$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "name=go_cache::$(go env GOCACHE)" >> $GITHUB_OUTPUT
-          # Parse semver
-          TAG=${GITHUB_REF/refs\/tags\//}
-          SEMVER_RE='[^0-9]*\([0-9]*\)[.]\([0-9]*\)[.]\([0-9]*\)\([0-9A-Za-z\.-]*\)'
-          TAG_MAJOR=`echo ${TAG#v} | sed -e "s#$SEMVER_RE#\1#"`
-          TAG_MINOR=`echo ${TAG#v} | sed -e "s#$SEMVER_RE#\2#"`
-          TAG_PATCH=`echo ${TAG#v} | sed -e "s#$SEMVER_RE#\3#"`
-          TAG_SPECIAL=`echo ${TAG#v} | sed -e "s#$SEMVER_RE#\4#"`
-          echo "name=tag_major::${TAG_MAJOR}" >> $GITHUB_OUTPUT
-          echo "name=tag_minor::${TAG_MINOR}" >> $GITHUB_OUTPUT
-          echo "name=tag_patch::${TAG_PATCH}" >> $GITHUB_OUTPUT
-          echo "name=tag_special::${TAG_SPECIAL}" >> $GITHUB_OUTPUT
+          echo
+          echo "System environment(set):"
+          set | sort
+          echo "go_cache=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+          echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "version_tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
-      # GoReleaser will take care of publishing those artifacts into the release
       - name: GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: "~> v2"
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.vars.outputs.version_tag }}
+
+# cspell: words GOCACHE
