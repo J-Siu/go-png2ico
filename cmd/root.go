@@ -76,7 +76,7 @@ var rootCmd = &cobra.Command{
 				if ico.Err != nil {
 					break
 				}
-				ico.AddPngFile(args[i])
+				ico.PngAddFile(args[i])
 				if global.Flag.Verbose {
 					ezlog.Log().N("Add").M(args[i]).Out()
 				}

@@ -47,11 +47,7 @@ func (t *ICO) New(file string) *ICO {
 	return t
 }
 
-func (t *ICO) PngCount() uint16 {
-	return t.pngCount
-}
-
-func (t *ICO) AddPng(png *PNG) *ICO {
+func (t *ICO) PngAdd(png *PNG) *ICO {
 	prefix := t.MyType + ".AddPng"
 	if !t.CheckErrInit(prefix) {
 		return t
@@ -69,12 +65,16 @@ func (t *ICO) AddPng(png *PNG) *ICO {
 	return t
 }
 
-func (t *ICO) AddPngFile(file string) *ICO {
+func (t *ICO) PngAddFile(file string) *ICO {
 	prefix := t.MyType + ".AddPngFile"
 	if !t.CheckErrInit(prefix) {
 		return t
 	}
-	return t.AddPng(new(PNG).New().Read(file))
+	return t.PngAdd(new(PNG).New().Read(file))
+}
+
+func (t *ICO) PngCount() uint16 {
+	return t.pngCount
 }
 
 func (t *ICO) Write() *ICO {
