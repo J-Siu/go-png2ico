@@ -49,20 +49,24 @@ func (t *PNG) IsPNG() bool {
 }
 
 // read PNG file and populate other fields
+//
+// use IsPNG() after Read()
 func (t *PNG) Read(file string) *PNG {
 	prefix := t.MyType + ".Read"
 	t.File = file
 	t.Buf, t.Err = os.ReadFile(t.File)
 	ezlog.Debug().N(prefix).N("byte").M(len(t.Buf)).Out()
 	if t.Err == nil {
-		t.checkMagic().getInfo()
+		if t.checkMagic() {
+			t.info()
+		}
 	}
 	errs.Queue(prefix, t.Err)
 	return t
 }
 
-// Verify if Buf is PNG, if yes, populate other fields
-func (t *PNG) checkMagic() *PNG {
+// Verify if Buf is PNG, update and return isPNG
+func (t *PNG) checkMagic() bool {
 	prefix := t.MyType + ".checkMagic"
 
 	t.isPNG = false
@@ -86,11 +90,11 @@ func (t *PNG) checkMagic() *PNG {
 		// CHECK 2: 4byte header[12:16] - chunk type IHDR
 		t.isPNG = t.isPNG && bytes.Equal([]byte("IHDR"), t.Buf[12:16])
 	}
-	return t
+	return t.isPNG
 }
 
 // Only update info fields if `isPNG` == true
-func (t *PNG) getInfo() *PNG {
+func (t *PNG) info() *PNG {
 	prefix := t.MyType + ".getInfo"
 	if t.isPNG {
 		// 4byte header[16:20] - width
