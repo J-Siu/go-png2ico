@@ -53,10 +53,10 @@ Flags:
 #### What It Does
 
 - Create ICO file from PNG files
-- Only use PNG format in ICO
 - Minimum overhead(16byte) per PNG added
+- Only use PNG format in ICO
 - PNG header check for input files
-- PNG header check for output file to avoid overwriting a PNG file
+- PNG header check for output(destination/target) file to avoid overwriting a PNG file
 
 #### What It Does Not
 
@@ -66,9 +66,11 @@ Flags:
 
 #### Limitation
 
-- ICO file always created from scratch or overwrote
+- ICO file always create from scratch or overwrite
+
+  (no append to nor replace existing icon in ICO file)
+
 - PNG into ICO only, other format/conversion not supported
-- Will not append nor replace within existing ICO file
 
 ### Module
 
@@ -101,14 +103,10 @@ type ICO struct {
 
 ```go
 func (t *ICO) New(file string) *ICO
+func (t *ICO) PngAdd(png *PNG) *ICO
+func (t *ICO) PngAddFile(file string) *ICO
 func (t *ICO) PngCount() uint16
-func (t *ICO) AddPng(png *PNG) *ICO
-func (t *ICO) AddPngFile(file string) *ICO
-func (t *ICO) WriteAll() *ICO
-func (t *ICO) open() *ICO
-func (t *ICO) write(b *[]byte) *ICO
-func (t *ICO) iconDir(num uint16) *[]byte
-func (t *ICO) iconDirEntry(pngIndex int) *[]byte
+func (t *ICO) Write() *ICO
 ```
 
 PNG
@@ -123,7 +121,6 @@ type PNG struct {
   Height uint8  `json:"Height"`
   Size   uint32 `json:"Size"`
   Width  uint8  `json:"Width"`
-  isPNG  bool
 }
 ```
 
@@ -131,8 +128,6 @@ type PNG struct {
 func (t *PNG) New() *PNG
 func (t *PNG) IsPNG() bool
 func (t *PNG) Read(file string) *PNG
-func (t *PNG) Check() *PNG
-func (t *PNG) info()
 ```
 
 #### ICO Usage

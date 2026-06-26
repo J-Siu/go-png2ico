@@ -40,3 +40,5 @@
   - update go-helper/v2
 - v2.0.7
   - fix#8 index out of range
+- v2.0.8
+  - update(breaking): AddPng() -> PngAdd(), AddPngFile() -> PngAddFile()
