@@ -16,11 +16,8 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"os"
-
-	"github.com/J-Siu/go-helper/v2/basestruct"
-	"github.com/J-Siu/go-helper/v2/errs"
-	"github.com/J-Siu/go-helper/v2/ezlog"
 )
 
 const (
@@ -32,7 +29,11 @@ const (
 //
 // Must use New() to initialize
 type ICO struct {
-	basestruct.Base
+	Debug         bool
+	Err           error
+	Initialized   bool
+	MyType        string
+	OnErrContinue bool
 
 	File       string `json:"File"`
 	fileHandle *os.File
@@ -40,10 +41,11 @@ type ICO struct {
 	pngs       []*PNG
 }
 
-func (t *ICO) New(file string) *ICO {
+func (t *ICO) New(file string, debug bool) *ICO {
 	t.MyType = "ICO"
 	t.File = file
 	t.Initialized = true
+	t.Debug = debug
 	return t
 }
 
@@ -52,7 +54,9 @@ func (t *ICO) PngAdd(png *PNG) *ICO {
 	if !t.CheckErrInit(prefix) {
 		return t
 	}
-	ezlog.Trace().N(prefix).N("png").M(png).Out()
+	if t.Debug {
+		PrintStruct(prefix+":png:", t)
+	}
 	if png.Err == nil {
 		if png.IsPNG() {
 			t.pngs = append(t.pngs, png)
@@ -60,8 +64,9 @@ func (t *ICO) PngAdd(png *PNG) *ICO {
 		} else {
 			t.Err = errors.New(png.File + " not PNG")
 		}
+	} else {
+		t.Err = errors.New(prefix + ":" + png.Err.Error())
 	}
-	errs.Queue(prefix, t.Err)
 	return t
 }
 
@@ -70,7 +75,7 @@ func (t *ICO) PngAddFile(file string) *ICO {
 	if !t.CheckErrInit(prefix) {
 		return t
 	}
-	return t.PngAdd(new(PNG).New().Read(file))
+	return t.PngAdd(new(PNG).New(t.Debug).Read(file))
 }
 
 func (t *ICO) PngCount() uint16 {
@@ -100,7 +105,6 @@ func (t *ICO) Write() *ICO {
 		}
 		t.writeByte(&png.Buf)
 	}
-	errs.Queue(prefix, t.Err)
 
 	return t
 }
@@ -111,7 +115,9 @@ func (t *ICO) open() *ICO {
 	if !t.CheckErrInit(prefix) {
 		return t
 	}
-	ezlog.Debug().N(prefix).M(t.File).Out()
+	if t.Debug {
+		fmt.Println(prefix+":", t.File)
+	}
 	t.fileHandle, t.Err = os.Create(t.File)
 	return t
 }
@@ -124,7 +130,9 @@ func (t *ICO) writeByte(b *[]byte) *ICO {
 	}
 	var n int
 	n, t.Err = t.fileHandle.Write(*b)
-	ezlog.Debug().N(prefix).M(n).Out()
+	if t.Debug {
+		fmt.Println(prefix+":", n)
+	}
 	return t
 }
 
@@ -139,7 +147,9 @@ func (t *ICO) iconDir() *[]byte {
 	*/
 	b := []byte{0, 0, 1, 0, 0, 0}
 	binary.LittleEndian.PutUint16(b[4:6], t.pngCount)
-	ezlog.Debug().N(prefix).M(hex.EncodeToString(b)).Out()
+	if t.Debug {
+		fmt.Println(prefix+":", hex.EncodeToString(b))
+	}
 	return &b
 }
 
@@ -191,8 +201,28 @@ func (t *ICO) iconDirEntry(pngIndex int) *[]byte {
 	binary.LittleEndian.PutUint16(b[6:8], pngDepth)
 	binary.LittleEndian.PutUint32(b[8:12], png.Size)
 	binary.LittleEndian.PutUint32(b[12:16], offset)
-
-	ezlog.Debug().N(prefix).N("byte").M(hex.EncodeToString(b)).N("png.File").M(png.File).Out()
-
+	if t.Debug {
+		fmt.Println(prefix+":byte:", hex.EncodeToString(b), "png.file:", png.File)
+	}
 	return &b
+}
+
+func (t *ICO) CheckErrInit(prefix string) (pass bool) {
+	pass = true
+	if !t.OnErrContinue {
+		// check error first
+		if t.Err != nil {
+			pass = false
+		} else if !t.Initialized {
+			errMsg := "not initialized"
+			if prefix != "" {
+				errMsg = prefix + ": " + errMsg
+			} else if t.MyType != "" {
+				errMsg = t.MyType + ": " + errMsg
+			}
+			t.Err = errors.New(errMsg)
+			pass = false
+		}
+	}
+	return pass
 }

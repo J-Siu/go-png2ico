@@ -24,10 +24,9 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
-	"github.com/J-Siu/go-helper/v2/errs"
-	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-png2ico/v2/global"
 	"github.com/J-Siu/go-png2ico/v2/p2i"
 	"github.com/spf13/cobra"
@@ -37,62 +36,52 @@ var rootCmd = &cobra.Command{
 	Use:     "go-png2ico <PNG file> <PNG file> ... <ICO file>",
 	Version: p2i.Version,
 	Short:   "Build ICO file from PNGs",
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
 		// --- debug setup
 
-		ezlog.SetLogLevel(ezlog.ERR)
 		if global.Flag.Debug {
-			ezlog.SetLogLevel(ezlog.DEBUG)
+			fmt.Println("Version:", p2i.Version)
+			p2i.PrintStruct("Flag", global.Flag)
 		}
-		ezlog.Debug().N("Version").M(p2i.Version).Ln("Flag").M(&global.Flag).Out()
-
 		// --- check number for filename, minimum 2
 
 		if len(args) < 2 {
-			errs.Queue("", errors.New("Input/Output file missing"))
+			err = errors.New("Input/Output file missing")
 		}
+		return
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		var (
 			ico     *p2i.ICO
 			icoFile string
 			png     *p2i.PNG
 			pngNum  = len(args) - 1
 		)
-		if errs.IsEmpty() {
-			icoFile = args[len(args)-1]
-			// check if output file is PNG
-			png = new(p2i.PNG).New().Read(icoFile)
-			if png.Err == nil && png.IsPNG() {
-				errs.Queue("", errors.New(png.File+": is PNG"))
-			} else {
-				// Clear the errs queue, as the icoFile may not exist yet and generated a read error
-				errs.Clear()
-			}
-		}
-		if errs.IsEmpty() {
-			ico = new(p2i.ICO).New(icoFile)
+
+		icoFile = args[len(args)-1]
+		// check output is NOT PNG
+		png = new(p2i.PNG).New(global.Flag.Debug).Read(icoFile)
+		if png.Err == nil && png.IsPNG() {
+			err = errors.New(png.File + ": is PNG")
+		} else {
+			ico = new(p2i.ICO).New(icoFile, global.Flag.Debug)
 			for i := range pngNum {
 				if ico.Err != nil {
 					break
 				}
 				ico.PngAddFile(args[i])
 				if global.Flag.Verbose {
-					ezlog.Log().N("Add").M(args[i]).Out()
+					fmt.Println("Add:", args[i])
 				}
 			}
-			ico.Write()
-			errs.Queue("", ico.Err)
+			if ico.Err == nil {
+				ico.Write()
+
+				fmt.Println("ICO:", icoFile)
+			}
+			err = ico.Err
 		}
-		if errs.IsEmpty() && global.Flag.Verbose {
-			ezlog.Log().N("ICO").M(icoFile).Out()
-		}
-	},
-	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		if errs.NotEmpty() {
-			ezlog.Err().L().M(errs.Errs()).Out()
-			cmd.Usage()
-		}
+		return err
 	},
 }
 

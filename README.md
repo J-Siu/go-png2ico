@@ -92,7 +92,11 @@ ICO
 
 ```go
 type ICO struct {
-  basestruct.Base
+  Debug         bool
+  Err           error
+  Initialized   bool
+  MyType        string
+  OnErrContinue bool
 
   File       string   `json:"File"`
   FileHandle *os.File `json:"FileHandle"`
@@ -102,7 +106,7 @@ type ICO struct {
 ```
 
 ```go
-func (t *ICO) New(file string) *ICO
+func (t *ICO) New(file string, debug bool) *ICO
 func (t *ICO) PngAdd(png *PNG) *ICO
 func (t *ICO) PngAddFile(file string) *ICO
 func (t *ICO) PngCount() uint16
@@ -113,7 +117,11 @@ PNG
 
 ```go
 type PNG struct {
-  basestruct.Base
+  Debug         bool
+  Err           error
+  Initialized   bool
+  MyType        string
+  OnErrContinue bool
 
   Buf    []byte `json:"Buf"`
   Depth  uint16 `json:"Depth"` // bit/pixel
@@ -125,7 +133,7 @@ type PNG struct {
 ```
 
 ```go
-func (t *PNG) New() *PNG
+func (t *PNG) New(debug bool) *PNG
 func (t *PNG) IsPNG() bool
 func (t *PNG) Read(file string) *PNG
 ```

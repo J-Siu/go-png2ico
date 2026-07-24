@@ -15,18 +15,20 @@ package p2i
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
+	"fmt"
 	"os"
-
-	"github.com/J-Siu/go-helper/v2/basestruct"
-	"github.com/J-Siu/go-helper/v2/errs"
-	"github.com/J-Siu/go-helper/v2/ezlog"
 )
 
 // PNG structure
 //
 // Must use New() to initialize
 type PNG struct {
-	basestruct.Base
+	Debug         bool
+	Err           error
+	Initialized   bool
+	MyType        string
+	OnErrContinue bool
 
 	Buf    []byte `json:"Buf"`
 	Depth  uint8  `json:"Depth"` // bit/pixel
@@ -37,9 +39,10 @@ type PNG struct {
 	isPNG  bool
 }
 
-func (t *PNG) New() *PNG {
+func (t *PNG) New(debug bool) *PNG {
 	t.MyType = "PNG"
 	t.Initialized = true
+	t.Debug = debug
 	return t
 }
 
@@ -55,13 +58,16 @@ func (t *PNG) Read(file string) *PNG {
 	prefix := t.MyType + ".Read"
 	t.File = file
 	t.Buf, t.Err = os.ReadFile(t.File)
-	ezlog.Debug().N(prefix).N("byte").M(len(t.Buf)).Out()
 	if t.Err == nil {
+		if t.Debug {
+			fmt.Println(prefix+":byte", len(t.Buf))
+		}
 		if t.checkMagic() {
 			t.info()
 		}
+	} else {
+		t.Err = errors.New(prefix + ":" + file + ":" + t.Err.Error())
 	}
-	errs.Queue(prefix, t.Err)
 	return t
 }
 
@@ -86,7 +92,9 @@ func (t *PNG) checkMagic() bool {
 	magic := []byte{0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}
 	t.isPNG = bytes.Equal(magic[:], t.Buf[:8])
 	if t.isPNG {
-		ezlog.Debug().N(prefix).M("Found PNG magic").Out()
+		if t.Debug {
+			fmt.Println(prefix + ":Found PNG magic")
+		}
 		// CHECK 2: 4byte header[12:16] - chunk type IHDR
 		t.isPNG = t.isPNG && bytes.Equal([]byte("IHDR"), t.Buf[12:16])
 	}
@@ -106,8 +114,29 @@ func (t *PNG) info() *PNG {
 		// file size
 		stat, _ := os.Stat(t.File)
 		t.Size = uint32(stat.Size())
-
-		ezlog.Debug().N(prefix).N("png").Lm(t).Out()
+		if t.Debug {
+			PrintStruct(prefix+":png", t)
+		}
 	}
 	return t
+}
+
+func (t *PNG) CheckErrInit(prefix string) (pass bool) {
+	pass = true
+	if !t.OnErrContinue {
+		// check error first
+		if t.Err != nil {
+			pass = false
+		} else if !t.Initialized {
+			errMsg := "not initialized"
+			if prefix != "" {
+				errMsg = prefix + ": " + errMsg
+			} else if t.MyType != "" {
+				errMsg = t.MyType + ": " + errMsg
+			}
+			t.Err = errors.New(errMsg)
+			pass = false
+		}
+	}
+	return pass
 }

@@ -42,3 +42,6 @@
   - fix#8 index out of range
 - v2.0.8
   - update(breaking): AddPng() -> PngAdd(), AddPngFile() -> PngAddFile()
+- v2.1.0
+  - dep: rm github.com/J-Siu/go-helper
+  - fix: proper debug for ico and png
