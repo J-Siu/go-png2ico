@@ -18,6 +18,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/J-Siu/go-mini-helper/basestruct"
+	"github.com/J-Siu/go-mini-helper/str"
 )
 
 const (
@@ -29,11 +32,7 @@ const (
 //
 // Must use New() to initialize
 type ICO struct {
-	Debug         bool
-	Err           error
-	Initialized   bool
-	MyType        string
-	OnErrContinue bool
+	basestruct.Embedded
 
 	File       string `json:"File"`
 	fileHandle *os.File
@@ -51,11 +50,11 @@ func (t *ICO) New(file string, debug bool) *ICO {
 
 func (t *ICO) PngAdd(png *PNG) *ICO {
 	prefix := t.MyType + ".AddPng"
-	if !t.CheckErrInit(prefix) {
+	if !t.IsInitAndNoErr(prefix) {
 		return t
 	}
 	if t.Debug {
-		PrintStruct(prefix+":png:", t)
+		fmt.Println(str.Struct2String(prefix+":png", png))
 	}
 	if png.Err == nil {
 		if png.IsPNG() {
@@ -72,7 +71,7 @@ func (t *ICO) PngAdd(png *PNG) *ICO {
 
 func (t *ICO) PngAddFile(file string) *ICO {
 	prefix := t.MyType + ".AddPngFile"
-	if !t.CheckErrInit(prefix) {
+	if !t.IsInitAndNoErr(prefix) {
 		return t
 	}
 	return t.PngAdd(new(PNG).New(t.Debug).Read(file))
@@ -84,7 +83,7 @@ func (t *ICO) PngCount() uint16 {
 
 func (t *ICO) Write() *ICO {
 	prefix := t.MyType + ".Write"
-	if !t.CheckErrInit(prefix) {
+	if !t.IsInitAndNoErr(prefix) {
 		return t
 	}
 	// Write ICONDIR
@@ -112,7 +111,7 @@ func (t *ICO) Write() *ICO {
 // open ICO file handle
 func (t *ICO) open() *ICO {
 	prefix := t.MyType + ".open"
-	if !t.CheckErrInit(prefix) {
+	if !t.IsInitAndNoErr(prefix) {
 		return t
 	}
 	if t.Debug {
@@ -125,7 +124,7 @@ func (t *ICO) open() *ICO {
 // writeByte ICO
 func (t *ICO) writeByte(b *[]byte) *ICO {
 	prefix := t.MyType + ".writeByte"
-	if !t.CheckErrInit(prefix) {
+	if !t.IsInitAndNoErr(prefix) {
 		return t
 	}
 	var n int
@@ -205,24 +204,4 @@ func (t *ICO) iconDirEntry(pngIndex int) *[]byte {
 		fmt.Println(prefix+":byte:", hex.EncodeToString(b), "png.file:", png.File)
 	}
 	return &b
-}
-
-func (t *ICO) CheckErrInit(prefix string) (pass bool) {
-	pass = true
-	if !t.OnErrContinue {
-		// check error first
-		if t.Err != nil {
-			pass = false
-		} else if !t.Initialized {
-			errMsg := "not initialized"
-			if prefix != "" {
-				errMsg = prefix + ": " + errMsg
-			} else if t.MyType != "" {
-				errMsg = t.MyType + ": " + errMsg
-			}
-			t.Err = errors.New(errMsg)
-			pass = false
-		}
-	}
-	return pass
 }

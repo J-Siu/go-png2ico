@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/J-Siu/go-mini-helper/str"
 	"github.com/J-Siu/go-png2ico/v2/global"
 	"github.com/J-Siu/go-png2ico/v2/p2i"
 	"github.com/spf13/cobra"
@@ -41,7 +42,7 @@ var rootCmd = &cobra.Command{
 
 		if global.Flag.Debug {
 			fmt.Println("Version:", p2i.Version)
-			p2i.PrintStruct("Flag", global.Flag)
+			fmt.Println(str.Struct2String("Flag", global.Flag))
 		}
 		// --- check number for filename, minimum 2
 

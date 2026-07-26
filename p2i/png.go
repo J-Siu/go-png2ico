@@ -18,17 +18,16 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/J-Siu/go-mini-helper/basestruct"
+	"github.com/J-Siu/go-mini-helper/str"
 )
 
 // PNG structure
 //
 // Must use New() to initialize
 type PNG struct {
-	Debug         bool
-	Err           error
-	Initialized   bool
-	MyType        string
-	OnErrContinue bool
+	basestruct.Embedded
 
 	Buf    []byte `json:"Buf"`
 	Depth  uint8  `json:"Depth"` // bit/pixel
@@ -115,28 +114,8 @@ func (t *PNG) info() *PNG {
 		stat, _ := os.Stat(t.File)
 		t.Size = uint32(stat.Size())
 		if t.Debug {
-			PrintStruct(prefix+":png", t)
+			fmt.Println(str.Struct2String(prefix+":png:", t))
 		}
 	}
 	return t
-}
-
-func (t *PNG) CheckErrInit(prefix string) (pass bool) {
-	pass = true
-	if !t.OnErrContinue {
-		// check error first
-		if t.Err != nil {
-			pass = false
-		} else if !t.Initialized {
-			errMsg := "not initialized"
-			if prefix != "" {
-				errMsg = prefix + ": " + errMsg
-			} else if t.MyType != "" {
-				errMsg = t.MyType + ": " + errMsg
-			}
-			t.Err = errors.New(errMsg)
-			pass = false
-		}
-	}
-	return pass
 }
